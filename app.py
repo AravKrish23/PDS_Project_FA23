@@ -9,8 +9,11 @@ app.config['SECRET_KEY'] = '12345678'
 
 bcrypt = Bcrypt(app)
 
-
 @app.route("/")
+def home_pre_login():
+    return render_template('home_pre_login.html')
+
+@app.route("/home")
 def home():
     return render_template('home.html')
 
@@ -74,10 +77,12 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route("/register_address", methods=['GET', 'POST'])
 def register_address():
     if request.method == 'POST':
         unit_number = request.form['unit_number']
+        flat_number = request.fomr['flat_number']
         street_name = request.form['street_name']
         city = request.form['city']
         state = request.form['state']
