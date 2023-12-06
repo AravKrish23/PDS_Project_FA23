@@ -1,58 +1,90 @@
+<!-- register_address.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Address</title>
+    <!-- Add your CSS link here -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/register_address.css') }}">
 </head>
 <body>
-    <h2>Register Address</h2>
+    <div class="header">
+        <a class="text-decoration-none text-white" href="{{ url_for('home') }}"><span>MediLink</span></a>
 
-    {% if step == 'select_zipcode' %}
-        <!-- Step 1: Select Zipcode -->
-        <form method="POST" action="{{ url_for('register_address') }}">
-            <label for="zipcode">Select Zipcode:</label>
-            <select name="zipcode" required>
-                {% for zipcode in zipcodes %}
-                    <option value="{{ zipcode }}">{{ zipcode }}</option>
-                {% endfor %}
-            </select>
-            <br>
-            <button type="submit">Next</button>
-        </form>
+        <nav>
+            <a href="/user/account/">Account</a>
+            {% if user.is_authenticated %}
+                <a href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
 
-    {% elif step == 'select_address' %}
-        <!-- Step 2: Select Address within the chosen Zipcode -->
-        <form method="POST" action="{{ url_for('register_address') }}">
-            <p>Serviceable Addresses in Zipcode: {{ zipcode }}</p>
+            {% endif %}
+        </nav>
+    </div>
+
+    <button id="selectZipcodeBtn">Select Zipcode</button>
+
+    <!-- The modal (pop-up) -->
+    <div id="selectZipcodeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            {% include 'select_zipcode.html' %}
+        </div>
+    </div>
+
+    <div class="register-address-container">
+        <h2>Register Address</h2>
+
+        {% if step == 'select_zipcode' %}
+            <!-- Step 1: Select Zipcode -->
+            <form method="POST" action="{{ url_for('register_address') }}">
+                <label for="zipcode">Select Zipcode:</label>
+                <select name="zipcode" required>
+                    {% for zipcode in zipcodes %}
+                        <option value="{{ zipcode }}">{{ zipcode }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <button type="submit">Next</button>
+            </form>
+
+        {% elif step == 'select_address' %}
+            <!-- Step 2: Select Address within the chosen Zipcode -->
+            <form method="POST" action="{{ url_for('register_address') }}">
+                <p>Serviceable Addresses in Zipcode: {{ zipcode }}</p>
+            
+                <label for="unit_number">Unit Number:</label>
+                <input type="text" name="unit_number" required>
+                <br>
         
-            <label for="unit_number">Unit Number:</label>
-            <input type="text" name="unit_number" required>
-            <br>
-    
-            <label for="flat_number">Flat Number:</label>
-            <input type="text" name="flat_number" required>
-            <br>
-    
-            <label for="street">Street:</label>
-            <input type="text" name="street" required>
-            <br>
-    
-            <label for="city">City:</label>
-            <input type="text" name="city" required>
-            <br>
-    
-            <label for="state">State:</label>
-            <input type="text" name="state" required>
-            <br>
+                <label for="flat_number">Flat Number:</label>
+                <input type="text" name="flat_number" required>
+                <br>
+        
+                <label for="street">Street:</label>
+                <input type="text" name="street" required>
+                <br>
+        
+                <label for="city">City:</label>
+                <input type="text" name="city" required>
+                <br>
+        
+                <label for="state">State:</label>
+                <input type="text" name="state" required>
+                <br>
 
-            <label for="zipcode_fixed">Zipcode:</label>
-            <input type="zipcode_fixed" name="zipcode_fixed" value= {{zipcode}} required>
-            <br>
+                <label for="zipcode_fixed">Zipcode:</label>
+                <input type="zipcode_fixed" name="zipcode_fixed" value="{{ zipcode }}" required>
+                <br>
 
-            <button type="submit">Register Selected Address</button>
-        </form>
+                <button type="submit">Register Selected Address</button>
+            </form>
+        {% endif %}
+    </div>
 
-    {% endif %}
+    <!-- Add your JavaScript link here -->
+    <script src="{{ url_for('static', filename='user/javascript/register_address.js') }}"></script>
 </body>
 </html>
