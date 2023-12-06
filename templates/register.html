@@ -9,42 +9,21 @@
     <script src="{{ url_for('static', filename='user/javascript/register.js') }}"></script>
 </head>
 <body>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="alert {{ messages[0].split(' ')[1] }} alert-dismissible shadow fade show" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                {{ messages[0] }}
-            </div>
-        {% endif %}
-    {% endwith %}
-
-    <div class="login-container">
-        <div class="login-box">
-            <h1>Register for <span>Smart Home Energy Management System (SHEMS)</span></h1>
-            <form id="registerForm" method="post" action="{{ url_for('register') }}" onsubmit="return validateRegistration();">
-                {{ csrf_token }}
-                <div class="user-box">
-                    <input type="text" name="username" placeholder=" " required>
-                    <label>Username*</label>
-                </div>
-                <div class="user-box">
-                    <input type="email" name="email" placeholder=" " required>
-                    <label>Email*</label>
-                </div>
-                <div class="user-box">
-                    <input type="tel" name="phone" placeholder=" " required>
-                    <label>Phone*</label>
-                </div>
-                <div class="user-box">
-                    <input type="password" name="password" placeholder=" " required>
-                    <label>Password*</label>
-                </div>
-                <button type="submit" id="btn_register_user">Register</button>
-            </form>
-            <p>Already have an account? <a href="#">Login here</a></p>
-        </div>
-    </div>
+    <h2>Register</h2>
+    <form method="POST" action="{{ url_for('register') }}">
+        <label for="username">Username:</label>
+        <input type="text" name="username" required>
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
+        <br>
+        <label for="phone">Phone:</label>
+        <input type="phone" name="phone" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" required>
+        <br>
+        <button type="submit">Register</button>
+    </form>
 </body>
 </html>
