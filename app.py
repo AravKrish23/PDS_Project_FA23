@@ -2,9 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import psycopg2 
+from flask_session import Session
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '12345678'
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
 
 bcrypt = Bcrypt(app)
@@ -62,12 +66,14 @@ def login():
                         password="password", host="localhost", port="5432") 
         
         cur = conn.cursor()
-        cur.execute('''select email, password from customers where email = (%s)''', (email,))
+        cur.execute('''select customer_id, email, password from customers where email = (%s)''', (email,))
         result = cur.fetchall()
         conn.commit()
         cur.close()
         if len(result) == 1:
-            if bcrypt.check_password_hash(result[0][1], password):
+            if bcrypt.check_password_hash(result[0][2], password):
+                session["name"] = request.form.get("name")
+                session["customer_id"] = request.form.get(result[0][2])
                 flash('Login successful!', 'success')
                 return redirect(url_for('home'))
             else:
@@ -81,18 +87,82 @@ def login():
 @app.route("/register_address", methods=['GET', 'POST'])
 def register_address():
     if request.method == 'POST':
-        unit_number = request.form['unit_number']
-        flat_number = request.fomr['flat_number']
-        street_name = request.form['street_name']
-        city = request.form['city']
-        state = request.form['state']
-        zipcode = request.form['zipcode']
+        if 'zipcode' in request.form:
+            # Step 1: User selected a zipcode
+            zipcode = request.form['zipcode']
+            return render_template('register_address.html', step='select_address', zipcode=zipcode)
 
-        flash('Address registered successfully!', 'success')
-        return redirect(url_for('home'))
+        elif 'zipcode_fixed' in request.form:
 
-    return render_template('register_address.html')
+            zipcode = request.form['zipcode_fixed']
+            state = request.form['state']
+            city = request.form['city']
+            street = request.form['street']
+            flat_number = request.form['flat_number']
+            unit_number = request.form['unit_number']
+            is_primary = True
+            is_billing = True
 
+            conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+            cur = conn.cursor()
+            cur.execute('''select address_id, unit_number, flat_number,
+                         street_name, city, state from address where zipcode_id = %s
+                          and state= %s and city = %s and street_name= %s and flat_number=%s and unit_number=%s''', (zipcode, state, city, street, flat_number, unit_number))
+            result = cur.fetchone()
+
+            conn.commit()
+            cur.close()
+            if len(result) > 0:
+
+                customer_id = 1;
+
+                if(is_primary):
+                    cur = conn.cursor()
+                    cur.execute('''select house_id  from house_info  where customer_id = %s and is_primary = true''', (customer_id, ))
+                    current_primary = cur.fetchone()[0]
+                    if current_primary is not None:
+                        cur.execute('''update house_info set is_primary = false where customer_id = %s''', (customer_id, ))
+                    cur.close()
+
+                if(is_billing):
+                    cur = conn.cursor()
+                    cur.execute('''select house_id  from house_info  where customer_id = %s and is_billing = true''', (customer_id, ))
+                    current_primary = cur.fetchone()[0]
+                    if current_primary is not None:
+                        cur.execute('''update house_info set is_billing = false where customer_id = %s''', (customer_id, ))
+                    cur.close()
+
+
+                
+
+                #  Check if the use is already the current owner
+                cur = conn.cursor()
+                
+                cur.execute('''select customer_id  from house_info  where address_id = %s order by owner_since desc''', (result[0], ))
+                current_owner = cur.fetchone()
+                
+                if current_owner[0] == customer_id:  
+                    warning = "You are already the current owner!"
+                    return(warning)
+                cur.close()
+
+                
+                cur = conn.cursor()
+                cur.execute('''insert into house_info (address_id, customer_id, owner_since, is_primary, is_billing) VALUES (%s, %s, %s, %s, %s) RETURNING house_id''', (result[0], customer_id, '20201223', is_primary, is_billing ))
+                new_reg_id = cur.fetchall()
+                nri = str(new_reg_id[0][0])
+                conn.commit()
+                cur.close()
+                success_statement = "Successfully Registered, Your Customer Id is:" + nri
+                return (success_statement)
+                
+            conn.close()
+            return redirect(url_for('home'))
+
+    zipcodes = ["12345", "56789", "10101"]  # Add your prepopulated zipcodes
+    return render_template('select_zipcode.html', zipcodes=zipcodes)
 
 @app.route("/register_device", methods=['GET', 'POST'])
 def register_device():

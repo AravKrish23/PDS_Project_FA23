@@ -7,23 +7,52 @@
 </head>
 <body>
     <h2>Register Address</h2>
-    <form method="POST" action="{{ url_for('register_address') }}">
-        <label for="unit_number">Unit Number:</label>
-        <input type="text" name="unit_number" required>
-        <br>
-        <label for="street_name">Street Name:</label>
-        <input type="text" name="street_name" required>
-        <br>
-        <label for="city">City:</label>
-        <input type="text" name="city" required>
-        <br>
-        <label for="state">State:</label>
-        <input type="text" name="state" required>
-        <br>
-        <label for="zipcode">Zipcode:</label>
-        <input type="text" name="zipcode" required>
-        <br>
-        <button type="submit">Register Address</button>
-    </form>
+
+    {% if step == 'select_zipcode' %}
+        <!-- Step 1: Select Zipcode -->
+        <form method="POST" action="{{ url_for('register_address') }}">
+            <label for="zipcode">Select Zipcode:</label>
+            <select name="zipcode" required>
+                {% for zipcode in zipcodes %}
+                    <option value="{{ zipcode }}">{{ zipcode }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <button type="submit">Next</button>
+        </form>
+
+    {% elif step == 'select_address' %}
+        <!-- Step 2: Select Address within the chosen Zipcode -->
+        <form method="POST" action="{{ url_for('register_address') }}">
+            <p>Serviceable Addresses in Zipcode: {{ zipcode }}</p>
+        
+            <label for="unit_number">Unit Number:</label>
+            <input type="text" name="unit_number" required>
+            <br>
+    
+            <label for="flat_number">Flat Number:</label>
+            <input type="text" name="flat_number" required>
+            <br>
+    
+            <label for="street">Street:</label>
+            <input type="text" name="street" required>
+            <br>
+    
+            <label for="city">City:</label>
+            <input type="text" name="city" required>
+            <br>
+    
+            <label for="state">State:</label>
+            <input type="text" name="state" required>
+            <br>
+
+            <label for="zipcode_fixed">Zipcode:</label>
+            <input type="zipcode_fixed" name="zipcode_fixed" value= {{zipcode}} required>
+            <br>
+
+            <button type="submit">Register Selected Address</button>
+        </form>
+
+    {% endif %}
 </body>
 </html>
