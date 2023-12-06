@@ -4,33 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Device</title>
+    <!-- Add your CSS link here -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/register_device.css') }}">
 </head>
 <body>
-    <h2>Register Device</h2>
-    <form method="POST" action="{{ url_for('register_device') }}">
-        <label for="device_type">Device Type:</label>
-        <select name="device_type" required>
-            <option value="Type1">Type 1</option>
-            <option value="Type2">Type 2</option>
-            <!-- Add more options as needed -->
-        </select>
-        <br>
-        <label for="device_model">Device Model:</label>
-        <select name="device_model" required>
-            <option value="Model1">Model 1</option>
-            <option value="Model2">Model 2</option>
-            <!-- Add more options as needed -->
-        </select>
-        <br>
-        <label for="address">Select Address:</label>
-        <select name="address" required>
-            <option value="Model1">Model 1</option>
-            <option value="Model2">Model 2</option>
-            <!-- {% for address in addresses %}
-                <option value="{{ address.id }}">{{ address.unit_number }} {{ address.street_name }}, {{ address.city }}, {{ address.state }} {{ address.zipcode }}</option>
-            {% endfor %} -->
-        </select>
-        <br>
-        <button type="submit">Register Device</button>
-    </form>
+    <div class="register-device-container">
+        <div class="register-device-box">
+            <h1>Register Device</h1>
+            <form method="POST" action="{{ url_for('register_device') }}">
+                {{ csrf_token }}
+                <div class="device-box">
+                    <label for="device_type">Device Type:</label>
+                    <select name="device_type" required>
+                        <option value="Type1">Type 1</option>
+                        <option value="Type2">Type 2</option>
+                        <!-- Add more options as needed -->
+                    </select>
+                </div>
+                <div class="device-box">
+                    <label for="device_model">Device Model:</label>
+                    <select name="device_model" required>
+                        <option value="Model1">Model 1</option>
+                        <option value="Model2">Model 2</option>
+                        <!-- Add more options as needed -->
+                    </select>
+                </div>
+                <div class="device-box">
+                    <label for="address">Select Address:</label>
+                    <select name="address" required>
+                        <option value="Model1">Model 1</option>
+                        <option value="Model2">Model 2</option>
+                        <!-- {% for address in addresses %}
+                            <option value="{{ address.id }}">{{ address.unit_number }} {{ address.street_name }}, {{ address.city }}, {{ address.state }} {{ address.zipcode }}</option>
+                        {% endfor %} -->
+                    </select>
+                </div>
+                <button type="submit">Register Device</button>
+            </form>
+        </div>
+    </div>
 </body>
+</html>

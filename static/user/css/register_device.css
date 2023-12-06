@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background: #ebf1f3;
+}
+
+.register-device-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; 
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.register-device-box {
+    width: 40%;
+    min-width: 300px;
+    max-width: 500px;
+    padding: 40px;
+    background-color: #0a2049;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+}
+
+.register-device-box h1 {
+    color: #fff;
+    padding-bottom: 20px;
+}
+
+.device-box {
+    margin-bottom: 20px;
+}
+
+.device-box label {
+    color: #fff;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.device-box select {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 10px;
+    border: none;
+    border-bottom: 1px solid #fff;
+    outline: none;
+    background: transparent;
+}
+
+.register-device-box button {
+    position: relative;
+    padding: 10px 20px;
+    color: #000000;
+    background-color: rgb(114, 195, 241);
+    font-size: 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: 0.5s;
+    margin-top: 20px;
+    letter-spacing: 4px;
+    width: 100%;
+}
+
+.register-device-box button:hover {
+    background: rgb(43, 158, 235);
+    border-radius: 5px;
+}
+
+/* Add any additional styling as needed */

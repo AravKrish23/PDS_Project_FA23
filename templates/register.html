@@ -4,26 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <!-- Add your CSS and JS links here -->
+    <!-- Add your CSS link here -->
     <link rel="stylesheet" href="{{ url_for('static', filename='user/css/register.css') }}">
-    <script src="{{ url_for('static', filename='user/javascript/register.js') }}"></script>
 </head>
 <body>
-    <h2>Register</h2>
-    <form method="POST" action="{{ url_for('register') }}">
-        <label for="username">Username:</label>
-        <input type="text" name="username" required>
-        <br>
-        <label for="email">Email:</label>
-        <input type="email" name="email" required>
-        <br>
-        <label for="phone">Phone:</label>
-        <input type="phone" name="phone" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" name="password" required>
-        <br>
-        <button type="submit">Register</button>
-    </form>
+    <div class="register-container">
+        <div class="register-box">
+            <h1>Create an Account</h1>
+            <form method="POST" action="{{ url_for('register') }}">
+                {{ csrf_token }}
+                <div class="user-box">
+                    <label for="username">Username:</label>
+                    <input type="text" name="username" required>
+                </div>
+                <div class="user-box">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="user-box">
+                    <label for="phone">Phone:</label>
+                    <input type="tel" name="phone" required>
+                </div>
+                <div class="user-box">
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit">Register</button>
+            </form>
+            <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+        </div>
+    </div>
 </body>
 </html>
