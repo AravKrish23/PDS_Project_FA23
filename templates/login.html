@@ -4,17 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <!-- Add your CSS and JS links here -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/login.css') }}">
+    <script src="{{ url_for('static', filename='user/javascript/login.js') }}"></script>
 </head>
 <body>
-    <h2>Login</h2>
-    <form method="POST" action="{{ url_for('login') }}">
-        <label for="email">Email:</label>
-        <input type="email" name="email" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" name="password" required>
-        <br>
-        <button type="submit">Login</button>
-    </form>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert {{ messages[0].split(' ')[1] }} alert-dismissible shadow fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Welcome to <span>Smart Home Energy Management System (SHEMS)</span></h1>
+            <form id="loginForm" method="post" action="{{ url_for('login') }}" onsubmit="return checkUserDetails();">
+                {{ csrf_token }}
+                <div class="user-box">
+                    <input type="email" name="user_email" placeholder=" " required>
+                    <label>Email*</label>
+                </div>
+                <div class="user-box">
+                    <input type="password" name="user_pwd" placeholder=" " required>
+                    <label>Password*</label>
+                </div>
+                <button type="submit" id="btn_login_user">login</button>
+            </form>
+            <p>Forgot your credentials? <a href="#">Recover here</a></p>
+            <p>Don't have an account? <a href="#">Register here</a></p>
+        </div>
+    </div>
 </body>
 </html>

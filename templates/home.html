@@ -4,13 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <!-- Add your CSS link here -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/home.css') }}">
 </head>
 <body>
-    <h2>Welcome to the Home Page</h2>
-    <p>Choose an option:</p>
-    <ul>
-        <li><a href="{{ url_for('register_device') }}">Register a Device</a></li>
-        <li><a href="{{ url_for('register_address') }}">Register an Address</a></li>
-    </ul>
+    <div class="container">
+        <div class="left">
+            <img src="{{ url_for('static', filename='home1.jpeg') }}" alt="Home Image" style="max-width: 100%;">
+        </div>
+    <div class="container">
+        <div class="left">
+            <h2>Welcome to the Home Page</h2>
+            <p>Choose an option:</p>
+            <ul>
+                <li><a href="{{ url_for('register_device') }}">Register a Device</a></li>
+                <li><a href="{{ url_for('register_address') }}">Register an Address</a></li>
+            </ul>
+        </div>
+    </div>
 </body>
 </html>
