@@ -10,10 +10,9 @@ app.config['SECRET_KEY'] = '12345678'
 bcrypt = Bcrypt(app)
 
 
-
 @app.route("/")
 def home():
-    return "Welcome to the registration and login system using Flask and PostgreSQL!"
+    return render_template('home.html')
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -74,6 +73,36 @@ def login():
             flash('Login unsuccessful. Please check your email and password.', 'danger')
 
     return render_template('login.html')
+
+@app.route("/register_address", methods=['GET', 'POST'])
+def register_address():
+    if request.method == 'POST':
+        unit_number = request.form['unit_number']
+        street_name = request.form['street_name']
+        city = request.form['city']
+        state = request.form['state']
+        zipcode = request.form['zipcode']
+
+        flash('Address registered successfully!', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('register_address.html')
+
+
+@app.route("/register_device", methods=['GET', 'POST'])
+def register_device():
+    if request.method == 'POST':
+        device_type = request.form['device_type']
+        device_model = request.form['device_model']
+        address_id = request.form['address']
+
+
+        flash('Device registered successfully!', 'success')
+        return redirect(url_for('home'))
+
+    # addresses = Address.query.filter_by(user=current_user).all()
+    return render_template('register_device.html')
+
 
 
 if __name__ == "__main__":
