@@ -1,23 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+import psycopg2 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '12345678'  # Change this to a random secret key
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost/pds_project'  # Replace with your PostgreSQL credentials
+app.config['SECRET_KEY'] = '12345678'
 
-db = SQLAlchemy(app)
+
 bcrypt = Bcrypt(app)
 
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
-
-    def __repr__(self):
-        return f"User('{self.username}', '{self.email}')"
 
 
 @app.route("/")
@@ -28,15 +19,32 @@ def home():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form['name']
+        name = request.form['username']
         email = request.form['email']
         password = request.form['password']
         phone = request.form['phone']
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        new_user = User(username=name, email=email, password=hashed_password, phone=phone)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Your account has been created!', 'success')
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+                        password="password", host="localhost", port="5432") 
+        
+        # Check if the email or phone number is already registered
+        cur = conn.cursor()
+        cur.execute('''select * from CUSTOMERS where email = %s or phone = %s''',(email, phone))
+        rec = cur.fetchall()
+        if len(rec) > 0:
+            cur.close()
+            return("The Following Credentials Have already been used to register some one else")
+        cur.close()
+
+        # Create User If the details are correct.
+        cur = conn.cursor()
+        cur.execute('''INSERT INTO CUSTOMERS (name, email, phone, password) values (%s, %s, %s, %s)''',(name, email, phone, hashed_password))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        # Add code for stating the user is created
+
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -47,11 +55,21 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        user = User.query.filter_by(email=email).first()
 
-        if user and bcrypt.check_password_hash(user.password, password):
-            flash('Login successful!', 'success')
-            return redirect(url_for('home'))
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+                        password="password", host="localhost", port="5432") 
+        
+        cur = conn.cursor()
+        cur.execute('''select email, password from customers where email = (%s)''', (email,))
+        result = cur.fetchall()
+        conn.commit()
+        cur.close()
+        if len(result) == 1:
+            if bcrypt.check_password_hash(result[0][1], password):
+                flash('Login successful!', 'success')
+                return redirect(url_for('home'))
+            else:
+                flash('Login unsuccessful. Please check your email and password.', 'danger')
         else:
             flash('Login unsuccessful. Please check your email and password.', 'danger')
 
@@ -59,5 +77,4 @@ def login():
 
 
 if __name__ == "__main__":
-    db.create_all()
     app.run(debug=True)
