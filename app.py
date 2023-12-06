@@ -33,7 +33,6 @@ def register():
         password = request.form['password']
         phone = request.form['phone']
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-
         new_user = User(username=name, email=email, password=hashed_password, phone=phone)
         db.session.add(new_user)
         db.session.commit()
