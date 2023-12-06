@@ -16,27 +16,27 @@
                 <div class="device-box">
                     <label for="device_type">Device Type:</label>
                     <select name="device_type" required>
-                        <option value="Type1">Type 1</option>
-                        <option value="Type2">Type 2</option>
-                        <!-- Add more options as needed -->
+                        {% for device in device_list %}
+                        <option value="{{device.DeviceType}}">{{device.DeviceType}}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="device-box">
                     <label for="device_model">Device Model:</label>
                     <select name="device_model" required>
-                        <option value="Model1">Model 1</option>
-                        <option value="Model2">Model 2</option>
-                        <!-- Add more options as needed -->
+                        {% for device in device_list %}
+                        {% if device.deviceType  %}
+                        <option value="{{device.DeviceModel}}">{{device.DeviceModel}}</option>
+                        {% endif %}
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="device-box">
                     <label for="address">Select Address:</label>
                     <select name="address" required>
-                        <option value="Model1">Model 1</option>
-                        <option value="Model2">Model 2</option>
-                        <!-- {% for address in addresses %}
-                            <option value="{{ address.id }}">{{ address.unit_number }} {{ address.street_name }}, {{ address.city }}, {{ address.state }} {{ address.zipcode }}</option>
-                        {% endfor %} -->
+                        {% for add in address_list %}
+                        <option value="{{add.HouseID}}">{{add.address}}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <button type="submit">Register Device</button>
