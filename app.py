@@ -1,15 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import psycopg2 
-from flask_session import Session
+from datetime import timedelta
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '12345678'
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
-
+app.permanent_session_lifetime = timedelta(minutes=30)
 
 bcrypt = Bcrypt(app)
 
@@ -19,7 +16,12 @@ def home_pre_login():
 
 @app.route("/home")
 def home():
-    return render_template('home.html')
+    if session["customer_id"] is not None:
+        return render_template('home.html', customer_id= session["name"])
+    else:
+        return render_template('home_pre_login.html')
+
+        
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -59,25 +61,30 @@ def register():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form['user_email']
+        password = request.form['user_pwd']
 
         conn = psycopg2.connect(database="pds_project", user="postgres", 
                         password="password", host="localhost", port="5432") 
         
         cur = conn.cursor()
-        cur.execute('''select customer_id, email, password from customers where email = (%s)''', (email,))
+        cur.execute('''select customer_id, name, email, password from customers where email = (%s)''', (email,))
         result = cur.fetchall()
         conn.commit()
         cur.close()
         if len(result) == 1:
-            if bcrypt.check_password_hash(result[0][2], password):
-                session["name"] = request.form.get("name")
-                session["customer_id"] = request.form.get(result[0][2])
-                flash('Login successful!', 'success')
+
+            if bcrypt.check_password_hash(result[0][3], password):
+                print("Here!")
+                session["name"] = result[0][1]
+                session["customer_id"] = result[0][0]
+                print(session["name"])
+                print(session["customer_id"])
                 return redirect(url_for('home'))
+
             else:
                 flash('Login unsuccessful. Please check your email and password.', 'danger')
+
         else:
             flash('Login unsuccessful. Please check your email and password.', 'danger')
 
@@ -164,6 +171,7 @@ def register_address():
     zipcodes = ["12345", "56789", "10101"]  # Add your prepopulated zipcodes
     return render_template('select_zipcode.html', zipcodes=zipcodes)
 
+
 @app.route("/register_device", methods=['GET', 'POST'])
 def register_device():
     if request.method == 'POST':
@@ -178,6 +186,12 @@ def register_device():
     # addresses = Address.query.filter_by(user=current_user).all()
     return render_template('register_device.html')
 
+
+@app.route("/logout")
+def logout():
+    session.pop("name", None)
+    session.pop("custoemr_id", None)
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
