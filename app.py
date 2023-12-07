@@ -187,9 +187,18 @@ def register_device():
     
         device_type = request.form['device_type']
         device_model = request.form['device_model']
-        address_id = request.form['address']
+        house_id = request.form['address']
 
-
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        cur = conn.cursor()
+        address_list = list()
+        cur.execute('''insert into enrolled_devices (house_id, device_type, device_model) VALUES(%s, %s, %s)''', (house_id, device_type, device_model))
+        conn.commit()
+        cur.close()
+        conn.close()        
+        
         flash('Device registered successfully!', 'success')
         return redirect(url_for('home'))
 
@@ -210,17 +219,21 @@ def register_device():
         cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
         addr = list(cur.fetchone())
         addr = ' '.join(addr)
-        address_list.append({"HouseID": res[1], "address":{addr}})
+        address_list.append({"HouseID": res[0], "address":{addr}})
 
     cur = conn.cursor()
     devices_list = list()
     cur.execute('''select device_type,device_model from devices''')
     devices = cur.fetchall()
-    device_list = list()
+    device_list = dict()
     for device in devices:
-        device_list.append({"DeviceType":device[0], "DeviceModel":device[1] })
+        if device[0] in device_list.keys():
+            device_list[device[0]].append(device[1])
+        else:
+            device_list[device[0]] = list()
+            device_list[device[0]].append(device[1])
     print(device_list)
-    
+
     conn.commit()
     cur.close()
     conn.close()

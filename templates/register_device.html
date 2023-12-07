@@ -13,24 +13,23 @@
             <h1>Register Device</h1>
             <form method="POST" action="{{ url_for('register_device') }}">
                 {{ csrf_token }}
+             
                 <div class="device-box">
                     <label for="device_type">Device Type:</label>
-                    <select name="device_type" required>
-                        {% for device in device_list %}
-                        <option value="{{device.DeviceType}}">{{device.DeviceType}}</option>
+                    <select id="device_type" name="device_type" required>
+                        <option disabled selected value> -- select an option -- </option>
+                        {% for key, values in device_list.items() %}
+                        <option value="{{key}}">{{key}}</option>
                         {% endfor %}
                     </select>
                 </div>
+
                 <div class="device-box">
                     <label for="device_model">Device Model:</label>
-                    <select name="device_model" required>
-                        {% for device in device_list %}
-                        {% if device.deviceType  %}
-                        <option value="{{device.DeviceModel}}">{{device.DeviceModel}}</option>
-                        {% endif %}
-                        {% endfor %}
+                    <select id="device_model" name="device_model" required>
                     </select>
                 </div>
+
                 <div class="device-box">
                     <label for="address">Select Address:</label>
                     <select name="address" required>
@@ -39,9 +38,40 @@
                         {% endfor %}
                     </select>
                 </div>
+
                 <button type="submit">Register Device</button>
             </form>
         </div>
     </div>
 </body>
+    <script type="text/javascript">
+
+    function myFunc(vars) {
+        return vars
+    }
+    
+     document.getElementById("device_type").onchange = function(evt){
+        var value = evt.target.value;
+        console.log(value);
+        device_list = myFunc({{device_list|tojson}});
+
+        var select = document.getElementById("device_model");
+        options = device_list[value];
+
+        for(var i = 0; i < options.length; i++) 
+        {
+            var opt = options[i];
+            console.log(options[i]);
+            var el = document.createElement("option");
+            el.text  = opt;
+            el.value = opt;
+            select.appendChild(el);
+        }
+        
+     };
+    
+    </script>
+    
 </html>
+
+
