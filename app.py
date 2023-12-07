@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import psycopg2 
 from datetime import timedelta
+from datetime import datetime, date, time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '12345678'
@@ -344,6 +345,69 @@ def deregister_device():
     return render_template('deregister_device.html', devices_house=dh, addresses = address_list)
 
 
+@app.route("/calculate_charges", methods=['GET', 'POST'])
+def calculate_charges():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"];
+
+    if request.method == 'POST':
+        selected_address = request.form['selected_address']
+        start_date = str(request.form['start'])
+        end_date =str(request.form['end'])
+
+        sd = datetime.strptime(start_date, '%Y-%m-%d')
+        ed = datetime.strptime(end_date, '%Y-%m-%d')
+
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        cur = conn.cursor()
+        address_list = list()
+        cur.execute('''with primary_data as (
+        select e.ed_id, e.value_stored, e.timestamp, a.zipcode_id, h.customer_id, h.house_id
+        from event_info e
+        join enrolled_devices ed on ed.ed_id = e.ed_id
+        join house_info h on ed.house_id = h.house_id
+        join address a on a.address_id = h.address_id
+        join event_type et on et.event_type_id = e.event_type_id
+        where et.event_type = %s)
+
+        select  sum(value_stored * price_per_unit) from primary_data pd
+        join price_map pm
+        on pd.zipcode_id = pm.zipcode
+        and pm.start_time = (select max(start_time) from price_map where
+        zipcode = pd.zipcode_id and start_time <= pd.timestamp)
+        where pd.timestamp between %s and %s
+        and pd.house_id = %s''', ('Energy Use',  sd, ed, selected_address))
+        result = cur.fetchall()
+        print(result)
+        return "The Charges for this user is" + str(result)
+
+        
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+
+    cur.close()
+    conn.close()
+
+    return render_template('calculate_charges.html', addresses=address_list)
 
 @app.route("/logout")
 def logout():
