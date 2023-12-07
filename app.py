@@ -175,6 +175,49 @@ def register_address():
     return render_template('select_zipcode.html', zipcodes=zipcodes)
 
 
+@app.route("/deregister_address", methods=['GET', 'POST'])
+def deregister_address():
+
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    customer_id = session["customer_id"];
+
+    if request.method == 'POST':
+
+        selected_address_id = request.form['selected_address']
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+    
+        cur = conn.cursor()
+        print("The Selected Address: ",  selected_address_id)
+        cur.execute('''update house_info set is_current= %s where customer_id = %s and house_id = %s''', (False, customer_id, selected_address_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash('Address deregistered successfully!', 'success')
+        return redirect(url_for('home'))
+
+
+# GET COMMAND
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+    return render_template('deregister_address.html', houses=address_list)
+
+
 @app.route("/register_device", methods=['GET', 'POST'])
 def register_device():
     
@@ -241,6 +284,65 @@ def register_device():
     
 
     return render_template('register_device.html', address_list=address_list, device_list=device_list)
+
+
+
+@app.route("/deregister_device", methods=['GET', 'POST'])
+def deregister_device():
+    
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"];
+
+    if request.method == 'POST':
+        selected_device_id = request.form['devices']
+        # Deregister the selected device from the current user
+
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        cur = conn.cursor()
+        address_list = list()
+        cur.execute('''delete from enrolled_devices where ed_id = %s''', (selected_device_id,))
+        conn.commit()
+        cur.close()
+        conn.close()        
+        
+        
+        return redirect(url_for('home'))
+    
+
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+    
+    dh = dict()
+    for house in address_list:
+        house_id = house["HouseID"]
+        cur.execute('''select ed_id,device_type,device_model from enrolled_devices where house_id = %s''', (house_id,))
+        devices = cur.fetchall()
+        dl = dict()
+        for device in devices:
+            dl[device[0]] = str(device[1]) + " - " + str(device[2])
+        dh[house_id] = dl
+    
+    print(dh)
+
+    return render_template('deregister_device.html', devices_house=dh, addresses = address_list)
+
 
 
 @app.route("/logout")
