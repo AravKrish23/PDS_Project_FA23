@@ -1,15 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import psycopg2 
-#from flask_session import Session
+from datetime import timedelta
+from datetime import datetime, date, time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '12345678'
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-#Session(app)
-
+app.permanent_session_lifetime = timedelta(minutes=30)
 
 bcrypt = Bcrypt(app)
 
@@ -19,11 +17,15 @@ def home_pre_login():
 
 @app.route("/home")
 def home():
-    return render_template('home.html')
+    if session["customer_id"] is not None:
+        return render_template('home.html', customer_id= session["name"])
+    else:
+        return render_template('home_pre_login.html')
 
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    
     if request.method == 'POST':
         name = request.form['username']
         email = request.form['email']
@@ -52,35 +54,45 @@ def register():
         # Add code for stating the user is created
 
         return redirect(url_for('login'))
-
+    if session["customer_id"] is not None:
+        return render_template('home.html', customer_id= session["name"])
     return render_template('register.html')
+
 
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form['user_email']
+        password = request.form['user_pwd']
 
         conn = psycopg2.connect(database="pds_project", user="postgres", 
                         password="password", host="localhost", port="5432") 
         
         cur = conn.cursor()
-        cur.execute('''select customer_id, email, password from customers where email = (%s)''', (email,))
+        cur.execute('''select customer_id, name, email, password from customers where email = (%s)''', (email,))
         result = cur.fetchall()
         conn.commit()
         cur.close()
         if len(result) == 1:
-            if bcrypt.check_password_hash(result[0][2], password):
-                session["name"] = request.form.get("name")
-                session["customer_id"] = request.form.get(result[0][2])
-                flash('Login successful!', 'success')
+
+            if bcrypt.check_password_hash(result[0][3], password):
+                print("Here!")
+                session["name"] = result[0][1]
+                session["customer_id"] = result[0][0]
+                print(session["name"])
+                print(session["customer_id"])
                 return redirect(url_for('home'))
+
             else:
                 flash('Login unsuccessful. Please check your email and password.', 'danger')
+
         else:
             flash('Login unsuccessful. Please check your email and password.', 'danger')
 
+    # if session["customer_id"] is not None:
+    #     return render_template('home.html', customer_id= session["name"])
+    
     return render_template('login.html')
 
 
@@ -116,12 +128,12 @@ def register_address():
             cur.close()
             if len(result) > 0:
 
-                customer_id = 1;
+                customer_id = session["customer_id"];
 
                 if(is_primary):
                     cur = conn.cursor()
                     cur.execute('''select house_id  from house_info  where customer_id = %s and is_primary = true''', (customer_id, ))
-                    current_primary = cur.fetchone()[0]
+                    current_primary = cur.fetchone()
                     if current_primary is not None:
                         cur.execute('''update house_info set is_primary = false where customer_id = %s''', (customer_id, ))
                     cur.close()
@@ -129,30 +141,27 @@ def register_address():
                 if(is_billing):
                     cur = conn.cursor()
                     cur.execute('''select house_id  from house_info  where customer_id = %s and is_billing = true''', (customer_id, ))
-                    current_primary = cur.fetchone()[0]
+                    current_primary = cur.fetchone()
                     if current_primary is not None:
                         cur.execute('''update house_info set is_billing = false where customer_id = %s''', (customer_id, ))
                     cur.close()
-
-
-                
 
                 #  Check if the use is already the current owner
                 cur = conn.cursor()
                 
                 cur.execute('''select customer_id  from house_info  where address_id = %s order by owner_since desc''', (result[0], ))
                 current_owner = cur.fetchone()
-                
-                if current_owner[0] == customer_id:  
-                    warning = "You are already the current owner!"
-                    return(warning)
-                cur.close()
+                if current_owner is not None:
+                    if current_owner[0] == customer_id:  
+                        warning = "You are already the current owner!"
+                        return(warning)
+                    cur.close()
 
                 
                 cur = conn.cursor()
-                cur.execute('''insert into house_info (address_id, customer_id, owner_since, is_primary, is_billing) VALUES (%s, %s, %s, %s, %s) RETURNING house_id''', (result[0], customer_id, '20201223', is_primary, is_billing ))
+                cur.execute('''insert into house_info (address_id, customer_id, owner_since, is_primary, is_billing, is_current) VALUES (%s, %s, %s, %s, %s, %s) RETURNING house_id''', (result[0], customer_id, '20201223', is_primary, is_billing, True ))
                 new_reg_id = cur.fetchall()
-                nri = str(new_reg_id[0][0])
+                nri = str(new_reg_id[0][0]) 
                 conn.commit()
                 cur.close()
                 success_statement = "Successfully Registered, Your Customer Id is:" + nri
@@ -160,25 +169,253 @@ def register_address():
                 
             conn.close()
             return redirect(url_for('home'))
-
+        
+    if session["customer_id"] is None:
+        return render_template('login.html')
     zipcodes = ["12345", "56789", "10101"]  # Add your prepopulated zipcodes
     return render_template('select_zipcode.html', zipcodes=zipcodes)
 
+
+@app.route("/deregister_address", methods=['GET', 'POST'])
+def deregister_address():
+
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    customer_id = session["customer_id"];
+
+    if request.method == 'POST':
+
+        selected_address_id = request.form['selected_address']
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+    
+        cur = conn.cursor()
+        print("The Selected Address: ",  selected_address_id)
+        cur.execute('''update house_info set is_current= %s where customer_id = %s and house_id = %s''', (False, customer_id, selected_address_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash('Address deregistered successfully!', 'success')
+        return redirect(url_for('home'))
+
+
+# GET COMMAND
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+    return render_template('deregister_address.html', houses=address_list)
+
+
 @app.route("/register_device", methods=['GET', 'POST'])
 def register_device():
+    
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"];
+
     if request.method == 'POST':
+    
         device_type = request.form['device_type']
         device_model = request.form['device_model']
-        address_id = request.form['address']
+        house_id = request.form['address']
 
-
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        cur = conn.cursor()
+        address_list = list()
+        cur.execute('''insert into enrolled_devices (house_id, device_type, device_model) VALUES(%s, %s, %s)''', (house_id, device_type, device_model))
+        conn.commit()
+        cur.close()
+        conn.close()        
+        
         flash('Device registered successfully!', 'success')
         return redirect(url_for('home'))
 
-    # addresses = Address.query.filter_by(user=current_user).all()
-    return render_template('register_device.html')
+    
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+
+    cur = conn.cursor()
+    devices_list = list()
+    cur.execute('''select device_type,device_model from devices''')
+    devices = cur.fetchall()
+    device_list = dict()
+    for device in devices:
+        if device[0] in device_list.keys():
+            device_list[device[0]].append(device[1])
+        else:
+            device_list[device[0]] = list()
+            device_list[device[0]].append(device[1])
+    print(device_list)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    
+
+    return render_template('register_device.html', address_list=address_list, device_list=device_list)
 
 
+
+@app.route("/deregister_device", methods=['GET', 'POST'])
+def deregister_device():
+    
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"];
+
+    if request.method == 'POST':
+        selected_device_id = request.form['devices']
+        # Deregister the selected device from the current user
+
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        cur = conn.cursor()
+        address_list = list()
+        cur.execute('''delete from enrolled_devices where ed_id = %s''', (selected_device_id,))
+        conn.commit()
+        cur.close()
+        conn.close()        
+        
+        
+        return redirect(url_for('home'))
+    
+
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+    
+    dh = dict()
+    for house in address_list:
+        house_id = house["HouseID"]
+        cur.execute('''select ed_id,device_type,device_model from enrolled_devices where house_id = %s''', (house_id,))
+        devices = cur.fetchall()
+        dl = dict()
+        for device in devices:
+            dl[device[0]] = str(device[1]) + " - " + str(device[2])
+        dh[house_id] = dl
+    
+    print(dh)
+
+    return render_template('deregister_device.html', devices_house=dh, addresses = address_list)
+
+
+@app.route("/calculate_charges", methods=['GET', 'POST'])
+def calculate_charges():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"];
+
+    if request.method == 'POST':
+        selected_address = request.form['selected_address']
+        start_date = str(request.form['start'])
+        end_date =str(request.form['end'])
+
+        sd = datetime.strptime(start_date, '%Y-%m-%d')
+        ed = datetime.strptime(end_date, '%Y-%m-%d')
+
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        cur = conn.cursor()
+        address_list = list()
+        cur.execute('''with primary_data as (
+        select e.ed_id, e.value_stored, e.timestamp, a.zipcode_id, h.customer_id, h.house_id
+        from event_info e
+        join enrolled_devices ed on ed.ed_id = e.ed_id
+        join house_info h on ed.house_id = h.house_id
+        join address a on a.address_id = h.address_id
+        join event_type et on et.event_type_id = e.event_type_id
+        where et.event_type = %s)
+
+        select  sum(value_stored * price_per_unit) from primary_data pd
+        join price_map pm
+        on pd.zipcode_id = pm.zipcode
+        and pm.start_time = (select max(start_time) from price_map where
+        zipcode = pd.zipcode_id and start_time <= pd.timestamp)
+        where pd.timestamp between %s and %s
+        and pd.house_id = %s''', ('Energy Use',  sd, ed, selected_address))
+        result = cur.fetchall()
+        print(result)
+        return "The Charges for this user is" + str(result)
+
+        
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+
+    cur.close()
+    conn.close()
+
+    return render_template('calculate_charges.html', addresses=address_list)
+
+@app.route("/logout")
+def logout():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    session.pop("name", None)
+    session.pop("customer_id", None)
+    return render_template('login.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deregister Address</title>
+</head>
+<body>
+    <h2>Deregister Address</h2>
+    <form method="POST" action="{{ url_for('deregister_address') }}">
+        <label for="selected_address">Select Address to Deregister:</label>
+        <select name="selected_address" required>
+            {% for house in houses %}
+                <option value="{{ house.HouseID }}">{{ house.address }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <button type="submit">Deregister Address</button>
+    </form>
+</body>
+</html>
