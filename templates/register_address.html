@@ -6,33 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Address</title>
     <!-- Add your CSS link here -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='user/css/register_address.css') }}">
 </head>
 <body>
-    <div class="header">
-        <a class="text-decoration-none text-white" href="{{ url_for('home') }}"><span>MediLink</span></a>
-
-        <nav>
-            <a href="/user/account/">Account</a>
-            {% if user.is_authenticated %}
-                <a href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
-            {% else %}
-            <a href="{{ url_for('login') }}">Login</a>
-
-            {% endif %}
-        </nav>
-    </div>
-
-    <button id="selectZipcodeBtn">Select Zipcode</button>
-
-    <!-- The modal (pop-up) -->
-    <div id="selectZipcodeModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            {% include 'select_zipcode.html' %}
-        </div>
-    </div>
+    {% include 'navbar.html' %}
 
     <div class="register-address-container">
         <h2>Register Address</h2>
@@ -76,12 +53,20 @@
                 <br>
 
                 <label for="zipcode_fixed">Zipcode:</label>
-                <input type="zipcode_fixed" name="zipcode_fixed" value="{{ zipcode }}" required>
+                <input type="zipcode_fixed" name="zipcode_fixed" value= {{zipcode}} required>
                 <br>
 
                 <button type="submit">Register Selected Address</button>
             </form>
         {% endif %}
+    </div>
+
+    <!-- The modal (pop-up) -->
+    <div id="selectZipcodeModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            {% include 'select_zipcode.html' %}
+        </div>
     </div>
 
     <!-- Add your JavaScript link here -->

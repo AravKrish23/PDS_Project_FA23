@@ -4,18 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Zipcode</title>
+    <!-- Add your CSS link here -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/select_zipcode.css') }}">
 </head>
 <body>
-    <h2>Select Zipcode</h2>
-    <form method="POST" action="{{ url_for('register_address') }}">
-        <label for="zipcode">Select Zipcode:</label>
-        <select name="zipcode" required>
-            {% for zipcode in zipcodes %}
-                <option value="{{ zipcode }}">{{ zipcode }}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <button type="submit">Next</button>
-    </form>
+    <div class="select-zipcode-container">
+        <h2>Select Zipcode</h2>
+        <form method="POST" action="{{ url_for('register_address') }}">
+            <label for="zipcode">Select Zipcode:</label>
+            <select name="zipcode" required>
+                {% for zipcode in zipcodes %}
+                    <option value="{{ zipcode }}">{{ zipcode }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <button type="submit">Next</button>
+        </form>
+    </div>
 </body>
 </html>
