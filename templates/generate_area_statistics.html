@@ -34,7 +34,8 @@
     
 
     <div id="energy-consumption-chart"></div>
-    <div id="device-type-consumption-chart"></div>
+    <div id="Consumption"></div>
+    <div id="Statistics"></div>
     <script>
         // Function to update the chart with new data
         $(document).ready(function() 
@@ -50,7 +51,7 @@
                 buttonClicked=""; 
                 console.log("getting Here! 21");
                 $.ajax({
-                    url: '/get_house_statistics',
+                    url: '/get_area_statistics',
                     type: 'POST',
                     data: {startDatetime: startDatetime, endDatetime: endDatetime, selected_address:selected_address},
                     success: function(response) 
@@ -74,9 +75,9 @@
             function updateGraph(response) {
             // Extract x and y data from the response
             var labels = response.labels;
-            var values = response.values;
-            var l2 = response.device_types;
-            var v2 = response.device_type_values;
+            var values = response.percentage_of_total;
+            var avg_usage = response.avg_above;
+            var own_consumption = response.own_consumption;
 
             var plotlyData = [{
                 values: values  ,
@@ -85,27 +86,25 @@
                 hole: 0.4
                 
             }];
-
-            var plotlyData2 = [{
-                values: v2,
-                labels: l2,
-                type: 'pie',
-                hole: 0.4
-                
-            }];
-            
-            
+                        
             var layout = {
-                        title: 'Energy Consumption By Device',
-                    };
-        
-            var layout2 = {
-                        title: 'Energy Consumption By Device Type',
+                        title: 'Energy Consumption By Your Household in this period',
                     };
 
             // Update the Plotly graph
             Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
-            Plotly.newPlot('device-type-consumption-chart', plotlyData2, layout2);
+
+            var consumptionData = "Your Energy Consumption for this period is: " + String(own_consumption)
+            var statText = "Compared to other houses of similar size in this zipcode, your house used "
+            console.log(avg_usage)
+                    
+            if(avg_usage > 0)
+                statText += String(avg_usage) + " more units in this time period"
+            else
+                statText += String(Math.abs(avg_usage)) + " less units in this time period"  
+
+            document.getElementById("Statistics").innerHTML = statText;
+            document.getElementById("Consumption").innerHTML = consumptionData;
         }
         });
 
