@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Energy Consumption Graph</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+    <h2>Dynamic Energy Consumption Graph</h2>
+    <h3>Date Time Form</h3>
+    
+    <form id="datetimeForm">
+        <label for="selected_address">Select Address to View:</label>
+        <select id = "selected_address" name="selected_address" required>
+            <option selected>Choose an option</option>
+            {% for house in houses %}
+                <option value="{{ house.HouseID }}">{{ house.address }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="startDatetime">Start Datetime:</label>
+        <input type="date" id="startDatetime" name="startDatetime" required>
+        <br>
+
+        <label for="endDatetime">End Datetime:</label>
+        <input type="date" id="endDatetime" name="endDatetime" required>
+        <br>
+        <br>
+
+        <label for="datelevel">Get Graph Split at a day, month or year level:</label>
+        <label>
+            <input type="radio" id="dateRadio" name="dateLevel" value="day" checked>
+            Day
+        </label>
+
+        <label>
+            <input type="radio" id="monthRadio" name="dateLevel" value="month">
+            Month
+        </label>
+
+        <label>
+            <input type="radio" id="yearRadio"  name="dateLevel" value="year">
+            Year
+        </label>
+
+        <br>
+        <br>
+        <br>
+
+        <input type ="submit" id="EC" value="Get EC Chart" >
+        <input type ="submit" id="PC" value="Get Price Chart" >
+        <!-- <button type="submit" name="form_sub" id="action" value="EC Chart">Get Energy Consumption Chart</button>
+        <button type="submit" name="form_sub" id="action" value="Price Chart">Get Price Comparison Chart</button> -->
+    </form>
+    
+
+    <div id="energy-consumption-chart"></div>
+
+    <script>
+        // Function to update the chart with new data
+        $(document).ready(function() 
+        {
+            var chosenGraph;
+            $("#datetimeForm").submit(function(event) {
+                event.preventDefault();
+                console.log(buttonClicked);
+                var startDatetime = $("#startDatetime").val();
+                var endDatetime = $("#endDatetime").val();
+                var selected_address= $("#selected_address").val();
+                var dateLevel = document.querySelector('input[name="dateLevel"]:checked').value;
+                chosenGraph = buttonClicked;
+                buttonClicked=""; 
+                console.log("getting Here! 21");
+                $.ajax({
+                    url: '/get_consumption_data',
+                    type: 'POST',
+                    data: {startDatetime: startDatetime, endDatetime: endDatetime, selected_address:selected_address, 
+                         dateLevel: dateLevel, chosenGraph: chosenGraph},
+                    success: function(response) 
+                    {
+                        // Update the table with the response data
+                        console.log("getting Here! 22");
+                                // Initial chart setup
+
+                        updateGraph(response);
+                    },
+                    error: function(error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+            $("#datetimeForm input[type = 'submit']").click(function(e){
+                buttonClicked = $(this).attr("id");
+                console.log
+            })
+
+            function updateGraph(response) {
+            // Extract x and y data from the response
+            var xData = response.dates;
+            var yData = response.values;
+
+            var plotlyData = [{
+                x: xData,
+                y: yData,
+                type: 'bar',
+                marker: {color: 'blue'},
+                
+            }];
+            if(chosenGraph =="EC")
+            {
+                var layout = {
+                            title: 'Dynamic Energy Consumption Over Time',
+                            xaxis: {title: 'Date'},
+                            yaxis: {title: 'Energy Consumption (kWh)'}
+                        };
+            }
+            else
+            {
+                var layout = {
+                            title: 'Dynamic Price Chart Over Time',
+                            xaxis: {title: 'Date'},
+                            yaxis: {title: 'Total Charge'}
+                        };
+            }
+
+
+            // Update the Plotly graph
+            Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
+        }
+        });
+
+    </script>
+</body>
+</html>

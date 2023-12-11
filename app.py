@@ -1,13 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import psycopg2 
 from datetime import timedelta
 from datetime import datetime, date, time
+import random 
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '12345678'
-app.permanent_session_lifetime = timedelta(minutes=30)
+app.permanent_session_lifetime = timedelta(minutes=90)
 
 bcrypt = Bcrypt(app)
 
@@ -54,8 +56,9 @@ def register():
         # Add code for stating the user is created
 
         return redirect(url_for('login'))
-    if session["customer_id"] is not None:
-        return render_template('home.html', customer_id= session["name"])
+    
+    # if session["customer_id"] is not None:
+    #     return render_template('home.html', customer_id= session["name"])
     return render_template('register.html')
 
 
@@ -340,7 +343,6 @@ def deregister_device():
             dl[device[0]] = str(device[1]) + " - " + str(device[2])
         dh[house_id] = dl
     
-    print(dh)
 
     return render_template('deregister_device.html', devices_house=dh, addresses = address_list)
 
@@ -408,6 +410,413 @@ def calculate_charges():
     conn.close()
 
     return render_template('calculate_charges.html', addresses=address_list)
+
+@app.route("/generate_consumption_graph_device")
+def generate_graph_device():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"]
+
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+    dh = dict()
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+        cur.execute('''select ed_id, device_type, device_model from enrolled_devices where house_id = %s''', (res[0],))
+        devices = cur.fetchall()
+        dl = dict()
+        for device in devices:
+            dl[device[0]] = str(device[0]) + ":" + str(device[1]) + " - " + str(device[2])
+        dh[res[0]] = dl
+    
+    cur.close()
+    conn.close()
+    return render_template('generate_consumption_graph_device.html', houses=address_list, device_list = dh)
+
+@app.route("/generate_consumption_graph")
+def generate_graph():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"]
+
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+
+    
+
+    cur.close()
+    conn.close()
+    return render_template('generate_consumption_graph.html', houses=address_list )
+
+
+@app.route("/generate_house_statistics")
+def generate_house_statistics():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"]
+
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+
+    
+
+    cur.close()
+    conn.close()
+    return render_template('generate_house_statistics.html', houses=address_list )
+
+@app.route("/generate_area_statistics")
+def generate_area_statistics():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"]
+
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+    cur = conn.cursor()
+    address_list = list()
+    cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
+    result = cur.fetchall()
+
+    if result is None:
+        return("No Address Registered for this user!")
+    
+
+    for res in result: 
+        cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
+        addr = list(cur.fetchone())
+        addr = ' '.join(addr)
+        address_list.append({"HouseID": res[0], "address":{addr}})
+
+    
+
+    cur.close()
+    conn.close()
+    return render_template('generate_area_statistics.html', houses=address_list )
+
+
+@app.route("/get_consumption_data",  methods=['GET', 'POST'])
+def get_consumption_data():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"]
+
+    if request.method == 'POST':
+        sd = request.form['startDatetime']
+        ed = request.form['endDatetime'] 
+        level = request.form['dateLevel']
+        selected_address = request.form['selected_address']
+        chosenGraph = request.form['chosenGraph']
+
+        
+        
+
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        if(chosenGraph == "EC"):    
+            cur = conn.cursor()
+            cur.execute('''with primary_data as (
+            select e.ed_id, e.value_stored, DATE_TRUNC(%s, e.timestamp ) as stamp, a.zipcode_id, h.customer_id, h.house_id
+            from event_info e
+            join enrolled_devices ed on ed.ed_id = e.ed_id
+            join house_info h on ed.house_id = h.house_id
+            join address a on a.address_id = h.address_id
+            join event_type et on et.event_type_id = e.event_type_id
+            where et.event_type = %s)
+
+            select  cast(stamp as date), sum(value_stored) from primary_data pd
+            join price_map pm
+            on pd.zipcode_id = pm.zipcode
+            where pd.stamp between %s and %s
+            and pd.house_id = %s
+            group by stamp''', (level, 'Energy Use',  sd, ed, selected_address))
+            result = cur.fetchall()
+            
+            dates = list()
+            values = list()
+            for data in result:
+                dates.append(str(data[0]))
+                values.append(data[1])
+
+            consumption_data = {'dates': dates, 'values':values}
+            return jsonify(consumption_data)
+        
+        else:
+            cur = conn.cursor()            
+            cur.execute('''with primary_data as (
+            select e.ed_id, e.value_stored, e.timestamp, date_trunc(%s , e.timestamp) as datestamp, a.zipcode_id, h.customer_id, h.house_id
+            from event_info e
+            join enrolled_devices ed on ed.ed_id = e.ed_id
+            join house_info h on ed.house_id = h.house_id
+            join address a on a.address_id = h.address_id
+            join event_type et on et.event_type_id = e.event_type_id
+            where et.event_type = %s)
+
+            select cast(datestamp as date), sum(value_stored * price_per_unit) from primary_data pd
+            join price_map pm
+            on pd.zipcode_id = pm.zipcode
+            and pm.start_time = (select max(start_time) from price_map where
+            zipcode = pd.zipcode_id and start_time <= pd.timestamp)
+            where pd.timestamp between %s and %s
+            and pd.house_id = %s
+            group by datestamp''', (level,'Energy Use',  sd, ed, selected_address))
+            result = cur.fetchall()
+            print(result)
+            dates = list()
+            values = list()
+            for data in result:
+                dates.append(str(data[0]))
+                values.append(data[1])
+
+            consumption_data = {'dates': dates, 'values':values}
+            return jsonify(consumption_data)
+
+@app.route("/get_consumption_data_device",  methods=['GET', 'POST'])
+def get_consumption_data_device():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"]
+
+    if request.method == 'POST':
+        sd = request.form['startDatetime']
+        ed = request.form['endDatetime'] 
+        level = request.form['dateLevel']
+        selected_address = request.form['selected_address']
+        chosenGraph = request.form['chosenGraph']
+        chosen_device = request.form['chosenDevice']
+        
+        
+
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        if(chosenGraph == "EC"):    
+            cur = conn.cursor()
+            cur.execute('''with primary_data as (
+            select e.ed_id, e.value_stored, DATE_TRUNC(%s, e.timestamp ) as stamp, a.zipcode_id, h.customer_id, h.house_id
+            from event_info e
+            join enrolled_devices ed on ed.ed_id = e.ed_id
+            join house_info h on ed.house_id = h.house_id
+            join address a on a.address_id = h.address_id
+            join event_type et on et.event_type_id = e.event_type_id
+            where et.event_type = %s)
+
+            select  cast(stamp as date), sum(value_stored) from primary_data pd
+            join price_map pm
+            on pd.zipcode_id = pm.zipcode
+            where pd.stamp between %s and %s
+            and pd.ed_id = %s 
+            and pd.house_id = %s
+            group by stamp''', (level, 'Energy Use',  sd, ed, chosen_device, selected_address))
+            result = cur.fetchall()
+            
+            dates = list()
+            values = list()
+            for data in result:
+                dates.append(str(data[0]))
+                values.append(data[1])
+
+            consumption_data = {'dates': dates, 'values':values}
+            return jsonify(consumption_data)
+        
+        else:
+            cur = conn.cursor()            
+            cur.execute('''with primary_data as (
+            select e.ed_id, e.value_stored, e.timestamp, date_trunc(%s, e.timestamp) as datestamp, a.zipcode_id, h.customer_id, h.house_id
+            from event_info e
+            join enrolled_devices ed on ed.ed_id = e.ed_id
+            join house_info h on ed.house_id = h.house_id
+            join address a on a.address_id = h.address_id
+            join event_type et on et.event_type_id = e.event_type_id
+            where et.event_type = %s)
+
+            select cast(datestamp as date), sum(value_stored * price_per_unit) from primary_data pd
+            join price_map pm
+            on pd.zipcode_id = pm.zipcode
+            and pm.start_time = (select max(start_time) from price_map where
+            zipcode = pd.zipcode_id and start_time <= pd.timestamp)
+            where pd.timestamp between %s and %s
+            and pd.ed_id  = %s
+            and pd.house_id = %s
+            group by datestamp''', (level,'Energy Use',  sd, ed, chosen_device, selected_address))
+            result = cur.fetchall()
+            dates = list()
+            values = list()
+            for data in result:
+                dates.append(str(data[0]))
+                values.append(data[1])
+
+            consumption_data = {'dates': dates, 'values':values}
+            return jsonify(consumption_data)
+
+
+@app.route("/get_house_statistics",  methods=['GET', 'POST'])
+def get_house_statistics():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"]
+
+    if request.method == 'POST':
+        sd = request.form['startDatetime']
+        ed = request.form['endDatetime'] 
+        selected_address = request.form['selected_address']
+        
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        cur = conn.cursor()            
+        cur.execute('''with primary_data as (
+        select e.ed_id, e.value_stored, e.timestamp, a.zipcode_id, h.customer_id, h.house_id
+        from event_info e
+        join enrolled_devices ed on ed.ed_id = e.ed_id
+        join house_info h on ed.house_id = h.house_id
+        join address a on a.address_id = h.address_id
+        join event_type et on et.event_type_id = e.event_type_id
+        where et.event_type = %s),
+                    
+
+        energy_data as (
+        select pd.ed_id, sum(value_stored) as energy_usage from primary_data pd
+        join price_map pm
+        on pd.zipcode_id = pm.zipcode
+        and pm.start_time = (select max(start_time) from price_map where
+        zipcode = pd.zipcode_id and start_time <= pd.timestamp)
+        where pd.timestamp between %s and %s
+        and pd.house_id = %s
+        group by pd.ed_id)
+                    
+        select ed2.ed_id, device_type, device_model, 
+        energy_usage from energy_data ed join enrolled_devices ed2 
+        on ed.ed_id = ed2.ed_id''', ('Energy Use',  sd, ed, selected_address))
+
+        result = cur.fetchall()
+        values = list()
+        labels  = list()
+        device_type_data = dict()
+        for data in result:
+            values.append(data[3])
+            labels.append(str(data[0])+"-"+str(data[1])+"_"+str(data[2]))
+            if data[1] in device_type_data.keys():
+                device_type_data[data[1]] += float(data[3])
+            else:
+                device_type_data[data[1]] = float(data[3])
+            
+        device_type_values = list()
+        for key in device_type_data:
+            device_type_values.append(device_type_data[key])
+            
+        consumption_data = {'values': values, 'labels':labels, 'device_types':list(device_type_data.keys()), 'device_type_values':device_type_values}
+        return jsonify(consumption_data)    
+
+@app.route("/get_area_statistics",  methods=['GET', 'POST'])
+def get_area_statistics():
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
+    customer_id = session["customer_id"]
+
+    if request.method == 'POST':
+        sd = request.form['startDatetime']
+        ed = request.form['endDatetime'] 
+        selected_address = request.form['selected_address']
+        
+        conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+            
+        cur = conn.cursor()            
+        cur.execute('''with primary_data as (
+        select e.ed_id, e.value_stored, e.timestamp, a.zipcode_id, h.customer_id, h.house_id
+        from event_info e
+        join enrolled_devices ed on ed.ed_id = e.ed_id
+        join house_info h on ed.house_id = h.house_id
+        join address a on a.address_id = h.address_id
+        join event_type et on et.event_type_id = e.event_type_id
+        where et.event_type = %s),
+                    
+
+        energy_data as (
+        select pd.ed_id, sum(value_stored) as energy_usage from primary_data pd
+        join price_map pm
+        on pd.zipcode_id = pm.zipcode
+        and pm.start_time = (select max(start_time) from price_map where
+        zipcode = pd.zipcode_id and start_time <= pd.timestamp)
+        where pd.timestamp between %s and %s
+        and pd.house_id = %s
+        group by pd.ed_id)
+                    
+        select ed2.ed_id, device_type, device_model, 
+        energy_usage from energy_data ed join enrolled_devices ed2 
+        on ed.ed_id = ed2.ed_id''', ('Energy Use',  sd, ed, selected_address))
+
+        result = cur.fetchall()
+        values = list()
+        labels  = list()
+        device_type_data = dict()
+        for data in result:
+            values.append(data[3])
+            labels.append(str(data[0])+"-"+str(data[1])+"_"+str(data[2]))
+            if data[1] in device_type_data.keys():
+                device_type_data[data[1]] += float(data[3])
+            else:
+                device_type_data[data[1]] = float(data[3])
+            
+        device_type_values = list()
+        for key in device_type_data:
+            device_type_values.append(device_type_data[key])
+            
+        consumption_data = {'values': values, 'labels':labels, 'device_types':list(device_type_data.keys()), 'device_type_values':device_type_values}
+        return jsonify(consumption_data)    
+
 
 @app.route("/logout")
 def logout():
