@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_wtf import CSRFProtect
 import psycopg2 
 from datetime import timedelta
 from datetime import datetime, date, time
@@ -10,6 +10,7 @@ import random
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '12345678'
 app.permanent_session_lifetime = timedelta(minutes=90)
+# csrf = CSRFProtect(app)
 
 bcrypt = Bcrypt(app)
 
@@ -786,8 +787,8 @@ def get_area_statistics():
         join house_info h on ed.house_id = h.house_id
         join address a on a.address_id = h.address_id
         join event_type et on et.event_type_id = e.event_type_id
-        where et.event_type = 'Energy Use')
-        and a.zipcode_id = %s,
+        where et.event_type = 'Energy Use' 
+        and a.zipcode_id = %s),
 
         sec_data as (
         select pd.house_id, sum(value_stored) as sum1 from primary_data pd
