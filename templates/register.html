@@ -8,10 +8,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='user/css/register.css') }}">
 </head>
 <body>
+
+{% include 'navbar.html' %}
     <div class="register-container">
         <div class="register-box">
             <h1>Create an Account</h1>
-            <form method="POST" action="{{ url_for('register') }}">
+            <form method="POST" action="{{ url_for('register') }}" onsubmit="return validateRegistration()">
                 {{ csrf_token }}
                 <div class="user-box">
                     <label for="username">Username:</label>
@@ -19,20 +21,28 @@
                 </div>
                 <div class="user-box">
                     <label for="email">Email:</label>
-                    <input type="email" name="email" required>
+                    <input type="email" name="email" id="email" required>
+                    <span id="emailError" class="error"></span>
                 </div>
                 <div class="user-box">
                     <label for="phone">Phone:</label>
-                    <input type="tel" name="phone" required>
+                    <input type="tel" name="phone" id="phone" required>
+                    <span id="phoneError" class="error"></span>
                 </div>
                 <div class="user-box">
                     <label for="password">Password:</label>
-                    <input type="password" name="password" required>
+                    <input type="password" name="password" id="password" required>
+                    <span id="passwordError" class="error"></span>
                 </div>
+                <div id="errorMessages" class="error"></div>
+
+
                 <button type="submit">Register</button> 
             </form>
             <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
         </div>
     </div>
+    
+    <script src="{{ url_for('static', filename='user/js/register.js') }}"></script>
 </body>
 </html>

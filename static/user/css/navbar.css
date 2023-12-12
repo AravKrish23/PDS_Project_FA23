@@ -32,3 +32,43 @@ form {
   margin: 0;
 }
 
+/* Add this CSS to your existing navbar.css file */
+#sidebar {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  background-color: #fff;
+  padding-top: 20px;
+  transition: 0.5s;
+  overflow-x: hidden;
+  color: #000;
+  z-index: 1000;
+  right: 0;
+}
+
+#sidebar ul.components {
+  padding: 20px 0;
+}
+
+#sidebar ul li {
+  padding: 10px;
+  font-size: 1.2em;
+}
+
+#content {
+  margin-left: 0;
+  padding: 15px;
+  transition: margin-left 0.5s;
+}
+
+#sidebar.active {
+  width: 250px;
+}
+
+#content.active {
+  margin-left: 250px;
+}
+
+
+
+

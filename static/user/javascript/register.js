@@ -1,35 +1,58 @@
 function validateRegistration() {
-    var name = document.forms["registrationForm"]["user_name"].value;
-    var email = document.forms["registrationForm"]["user_email"].value;
+    var name = document.forms["registrationForm"]["username"].value;
+    var email = document.forms["registrationForm"]["email"].value;
     var password = document.forms["registrationForm"]["password"].value;
-    var phone = document.forms["registrationForm"]["user_phone"].value;
+    var phone = document.forms["registrationForm"]["phone"].value;
 
-    // Simple validation, you may enhance it based on your specific requirements
+    // Clear previous error messages
+    document.getElementById("emailError").innerText = "";
+    document.getElementById("passwordError").innerText = "";
+    document.getElementById("phoneError").innerText = "";
+    document.getElementById("errorMessages").innerText = ""; // Clear general error messages
+
     if (name.trim() === "") {
-        alert("Please enter your full name.");
+        showError("Please enter your full name.");
         return false;
     }
 
     if (email.trim() === "") {
-        alert("Please enter your email address.");
+        showError("Please enter your email address.");
+        return false;
+    } else if (!validateEmail(email)) {
+        showError("Invalid email format");
         return false;
     }
 
-    // Add more validation for email format if needed
-
-    if (password.trim() === "") {
-        alert("Please enter a password.");
+    if (password.trim().length < 8 || /\s/.test(password)) {
+        showError("Password must be at least 8 characters long and should not contain spaces");
+        return false;
+    } else if (!validatePassword(password)) {
+        showError("Password must have 1 uppercase, 1 lowercase, 1 digit, and 1 special character");
         return false;
     }
 
-    // Add more password strength validation if needed
-
-    if (phone.trim() === "") {
-        alert("Please enter your phone number.");
+    if (!/^[0-9()+-]+$/.test(phone)) {
+        showError("Phone number should contain only digits and valid characters (+, -, (, ))");
+        return false;
+    } else if (phone.trim().length < 10 || phone.trim().length > 13) {
+        showError("Invalid phone number length");
         return false;
     }
-
-    // Add more validation for phone number format if needed
 
     return true;
+}
+
+function validateEmail(email) {
+    var emailRegex = /\S+@\S+\.\S+/;
+    return emailRegex.test(email);
+}
+
+function validatePassword(password) {
+    var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+}
+
+function showError(message) {
+    // Display error messages in the HTML
+    document.getElementById("errorMessages").innerText = message;
 }
