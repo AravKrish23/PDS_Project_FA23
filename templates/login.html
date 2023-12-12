@@ -24,7 +24,6 @@
         <div class="login-box">
             <h1>Welcome to <span>Smart Home Energy Management System (SHEMS)</span></h1>
             <form id="loginForm" method="post" action="{{ url_for('login') }}" onsubmit="return checkUserDetails();">
-                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
                 <div class="user-box">
                     <input type="email" name="user_email" placeholder=" " required>
                     <label>Email*</label>
