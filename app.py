@@ -21,11 +21,14 @@ bcrypt = Bcrypt(app)
 
 @app.route("/")
 def home_pre_login():
-    return render_template('home_pre_login.html')
+    if 'customer_id' in session:
+        return render_template('home.html', customer_id= session["name"])
+    else:
+        return render_template('home_pre_login.html')
 
 @app.route("/home")
 def home():
-    if session["customer_id"] is not None:
+    if 'customer_id' in session:
         return render_template('home.html', customer_id= session["name"])
     else:
         return render_template('home_pre_login.html')
@@ -33,7 +36,9 @@ def home():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+
     
+     
     if request.method == 'POST':
         name = request.form['username']
         email = request.form['email']
@@ -49,11 +54,17 @@ def register():
         else:
             failure_msg = response[1]
             flash(failure_msg)
+    
+    if 'customer_id' in session:
+        return render_template('home.html', customer_id= session["name"])
+    
     return render_template('register.html')
 
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    
+    
     if request.method == 'POST':
         email = request.form['user_email']
         password = request.form['user_pwd']
@@ -69,10 +80,17 @@ def login():
             failure_msg = "Incorrect User or Password"
             flash(failure_msg)
     
+    if 'customer_id' in session:
+        return render_template('home.html', customer_id= session["name"])
+
     return render_template('login.html')
 
 @app.route("/register_address", methods=['GET', 'POST'])
 def register_address():
+    
+    if session["customer_id"] is None:
+        return render_template('login.html')
+    
     if request.method == 'POST':
         if 'zipcode' in request.form:
             # Step 1: User selected a zipcode
@@ -98,8 +116,9 @@ def register_address():
                 flash(success_msg)
             return redirect(url_for('home'))
         
-    if session["customer_id"] is None:
+    if 'customer_id' not in session:
         return render_template('login.html')
+    
     zipcodes = ["12345", "56789", "10101"]  # Add your prepopulated zipcodes
     return render_template('select_zipcode.html', zipcodes=zipcodes)
 
@@ -107,8 +126,9 @@ def register_address():
 @app.route("/deregister_address", methods=['GET', 'POST'])
 def deregister_address():
 
-    if session["customer_id"] is None:
+    if 'customer_id' not in session:
         return render_template('login.html')
+    
     customer_id = session["customer_id"];
 
     if request.method == 'POST':
@@ -136,7 +156,7 @@ def deregister_address():
 @app.route("/register_device", methods=['GET', 'POST'])
 def register_device():
     
-    if session["customer_id"] is None:
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     customer_id = session["customer_id"];
@@ -179,7 +199,7 @@ def register_device():
 @app.route("/deregister_device", methods=['GET', 'POST'])
 def deregister_device():
     
-    if session["customer_id"] is None:
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     customer_id = session["customer_id"];
@@ -208,7 +228,8 @@ def deregister_device():
 
 @app.route("/calculate_charges", methods=['GET', 'POST'])
 def calculate_charges():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     customer_id = session["customer_id"];
@@ -233,7 +254,8 @@ def calculate_charges():
 
 @app.route("/generate_consumption_graph_device")
 def generate_graph_device():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     customer_id = session["customer_id"]
@@ -252,7 +274,8 @@ def generate_graph_device():
 
 @app.route("/generate_consumption_graph")
 def generate_graph():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     customer_id = session["customer_id"]
@@ -269,7 +292,8 @@ def generate_graph():
 
 @app.route("/generate_house_statistics")
 def generate_house_statistics():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     customer_id = session["customer_id"]
@@ -284,7 +308,8 @@ def generate_house_statistics():
 
 @app.route("/generate_area_statistics")
 def generate_area_statistics():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     customer_id = session["customer_id"]
@@ -299,7 +324,8 @@ def generate_area_statistics():
 
 @app.route("/get_consumption_data",  methods=['POST'])
 def get_consumption_data():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     if request.method == 'POST':
@@ -313,7 +339,8 @@ def get_consumption_data():
 
 @app.route("/get_consumption_data_device",  methods=['GET', 'POST'])
 def get_consumption_data_device():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')    
 
     if request.method == 'POST':
@@ -328,7 +355,8 @@ def get_consumption_data_device():
 
 @app.route("/get_house_statistics",  methods=['GET', 'POST'])
 def get_house_statistics():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     if request.method == 'POST':
@@ -340,7 +368,8 @@ def get_house_statistics():
 
 @app.route("/get_area_statistics",  methods=['GET', 'POST'])
 def get_area_statistics():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     
@@ -355,7 +384,8 @@ def get_area_statistics():
 
 @app.route("/logout")
 def logout():
-    if session["customer_id"] is None:
+    
+    if 'customer_id' not in session:
         return render_template('login.html')
     session.pop("name", None)
     session.pop("customer_id", None)
