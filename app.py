@@ -58,12 +58,14 @@ def login():
         response = check_login(email)
         if response[0] is None:
             failure_msg = response[3] 
+            flash(failure_msg)
         elif bcrypt.check_password_hash(response[0], password):
             session["name"] = response[1]
             session["customer_id"] = response[2]
             return redirect(url_for('home'))
         else:
             failure_msg = "Incorrect User or Password"
+            flash(failure_msg)
     
     return render_template('login.html')
 

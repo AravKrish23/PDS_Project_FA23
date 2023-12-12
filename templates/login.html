@@ -11,15 +11,15 @@
 <body>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <div class="alert {{ messages[0].split(' ')[1] }} alert-dismissible shadow fade show" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                {{ messages[0] }}
-            </div>
+        <script>
+            var messages = {{ messages | safe }};
+            for (var i=0; i<messages.length; i++) {
+            alert(messages[i]);
+            console.log(messages[i]);
+            }
+        </script>
         {% endif %}
     {% endwith %}
-
     <div class="login-container">
         <div class="login-box">
             <h1>Welcome to <span>Smart Home Energy Management System (SHEMS)</span></h1>
