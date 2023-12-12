@@ -6,24 +6,34 @@
     <title>Register Address</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
+            font-family: sans-serif;
+            background-color: #ebf1f3;
+            color: #fff;
             margin: 0;
             padding: 20px;
             text-align: center;
+            display: flex;
+            justify-content: center;
         }
 
         h2 {
-            color: #008080;
+            color: #000;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
         }
 
         form {
-            display: inline-block;
+            width: 300px;
             text-align: left;
-            margin: 20px auto;
+            margin-top: 20px;
             padding: 20px;
-            background-color: #fff;
+            background-color: #0a2049;
             border: 1px solid #ddd;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -32,7 +42,7 @@
         label {
             display: block;
             margin-bottom: 5px;
-            color: #333;
+            color: #fff;
         }
 
         input, select {
@@ -42,9 +52,13 @@
             box-sizing: border-box;
         }
 
+        p {
+            color: #fff; /* Set text color to white */
+        }
+
         button {
-            background-color: #008080;
-            color: #fff;
+            background-color: rgb(114, 195, 241);
+            color: #000;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -55,6 +69,7 @@
 <body>
 
 {% include 'navbar.html' %}
+<div class="content">
     <h2>Register Address</h2>
 
     {% if step == 'select_zipcode' %}
@@ -75,23 +90,23 @@
         <!-- Step 2: Select Address within the chosen Zipcode -->
         <form method="POST" action="{{ url_for('register_address') }}">
             <p>Serviceable Addresses in Zipcode: {{ zipcode }}</p>
-            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
             <label for="unit_number">Unit Number:</label>
             <input type="text" name="unit_number" required>
             <br>
-    
+
             <label for="flat_number">Flat Number:</label>
             <input type="text" name="flat_number" required>
             <br>
-    
+
             <label for="street">Street:</label>
             <input type="text" name="street" required>
             <br>
-    
+
             <label for="city">City:</label>
             <input type="text" name="city" required>
             <br>
-    
+
             <label for="state">State:</label>
             <input type="text" name="state" required>
             <br>
@@ -103,5 +118,6 @@
             <button type="submit">Register Selected Address</button>
         </form>
     {% endif %}
+</div>
 </body>
 </html>

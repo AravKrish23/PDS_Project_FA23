@@ -5,54 +5,52 @@ function validateRegistration() {
     var phone = document.forms["registrationForm"]["phone"].value;
 
     // Clear previous error messages
-    document.getElementById("emailError").innerText = "";
-    document.getElementById("passwordError").innerText = "";
-    document.getElementById("phoneError").innerText = "";
-    document.getElementById("errorMessages").innerText = ""; // Clear general error messages
+    document.getElementById("nameError").textContent = "";
+    document.getElementById("emailError").textContent = "";
+    document.getElementById("passwordError").textContent = "";
+    document.getElementById("phoneError").textContent = "";
+    document.getElementById("errorMessages").textContent = ""; // Clear general error messages
 
     if (name.trim() === "") {
-        showError("Please enter your full name.");
+        showError("nameError", "Please enter your full name.");
         return false;
     }
 
     if (email.trim() === "") {
-        showError("Please enter your email address.");
+        showError("emailError", "Please enter your email address.");
         return false;
     } else if (!validateEmail(email)) {
-        showError("Invalid email format");
+        showError("emailError", "Invalid email format");
         return false;
     }
 
-    if (password.trim().length < 8 || /\s/.test(password)) {
-        showError("Password must be at least 8 characters long and should not contain spaces");
+    if (password.trim().length < 8) {
+        showError("passwordError", "Password must be at least 8 characters long and should not contain spaces");
         return false;
-    } else if (!validatePassword(password)) {
-        showError("Password must have 1 uppercase, 1 lowercase, 1 digit, and 1 special character");
-        return false;
-    }
+    } 
+    
 
-    if (!/^[0-9()+-]+$/.test(phone)) {
-        showError("Phone number should contain only digits and valid characters (+, -, (, ))");
+    if (!/^\d+$/.test(phone)) {
+        showError("phoneError", "Phone number should contain only digits");
         return false;
     } else if (phone.trim().length < 10 || phone.trim().length > 13) {
-        showError("Invalid phone number length");
+        showError("phoneError", "Invalid phone number length");
         return false;
     }
+    
+
+    // Assume registration is successful, and redirect to the home page
+    redirectToHomePage();
 
     return true;
 }
 
-function validateEmail(email) {
-    var emailRegex = /\S+@\S+\.\S+/;
-    return emailRegex.test(email);
-}
-
-function validatePassword(password) {
-    var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return passwordRegex.test(password);
-}
-
-function showError(message) {
+function showError(id, message) {
     // Display error messages in the HTML
-    document.getElementById("errorMessages").innerText = message;
+    document.getElementById(id).textContent = message;
+}
+
+function redirectToHomePage() {
+    // Replace this with the actual URL of your home page
+    window.location.href = '/home';
 }
