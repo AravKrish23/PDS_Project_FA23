@@ -9,7 +9,7 @@ from register_validate import check_and_create_user
 from login_validate import check_login
 from address import register_new_house, get_customer_houses, deregister_address
 from devices import get_devices, register_device,deregister_device, get_devices_in_house
-from graph_queries import get_house_consumption_data, get_device_consumption_data, get_area_statistics, get_house_statistics
+from graph_queries import get_house_consumption_data, get_device_consumption_data, get_area_statistics, get_house_statistics, calculate_charges_cost
 
 
 app = Flask(__name__)
@@ -209,7 +209,7 @@ def calculate_charges():
         end_date =str(request.form['end'])
         sd = datetime.strptime(start_date, '%Y-%m-%d')
         ed = datetime.strptime(end_date, '%Y-%m-%d')
-
+        calculate_charges_cost(sd, ed, selected_address)
         
         
     response = get_customer_houses(customer_id)
