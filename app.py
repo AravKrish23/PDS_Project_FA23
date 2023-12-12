@@ -157,6 +157,8 @@ def register_device():
 
     
     response = get_customer_houses(customer_id)
+    print("Here!")
+    print(response)
     if response[0] == 0:
         failure_msg = response[1]
         flash(failure_msg)

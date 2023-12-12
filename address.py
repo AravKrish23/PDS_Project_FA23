@@ -19,8 +19,8 @@ def get_customer_houses(customer_id):
     address_list = list()
     cur.execute('''select house_id, address_id from house_info where customer_id = %s and is_current= %s''', (customer_id, True))
     result = cur.fetchall()
-
-    if result is None:
+    
+    if len(result) ==0:
         failure_msg = [0, "No Address Registered for this user!"]
         return failure_msg
     
