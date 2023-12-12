@@ -68,7 +68,7 @@
         <div class="register-device-box">
             <h1>Register Device</h1>
             <form method="POST" action="{{ url_for('register_device') }}">
-                {{ csrf_token }}
+                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
              
                 <div class="device-box">
                     <label for="device_type">Device Type:</label>

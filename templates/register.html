@@ -24,7 +24,7 @@
         <div class="register-box">
             <h1>Create an Account</h1>
             <form method="POST" action="{{ url_for('register') }}" onsubmit="return validateRegistration()">
-                {{ csrf_token }}
+                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
                 <div class="user-box">
                     <label for="username">Username:</label>
                     <input type="text" name="username" required>

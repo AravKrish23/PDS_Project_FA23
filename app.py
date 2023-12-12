@@ -8,14 +8,14 @@ import random
 from register_validate import check_and_create_user
 from login_validate import check_login
 from address import register_new_house, get_customer_houses, deregister_address
-from devices import get_devices, register_device,deregister_device, get_devices_in_house
+from devices import get_devices, register_device_home,deregister_device_home, get_devices_in_house
 from graph_queries import get_house_consumption_data, get_device_consumption_data, get_area_statistics, get_house_statistics, calculate_charges_cost
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '12345678'
 app.permanent_session_lifetime = timedelta(minutes=90)
-# csrf = CSRFProtect(app)
+csrf = CSRFProtect(app)
 
 bcrypt = Bcrypt(app)
 
@@ -166,7 +166,7 @@ def register_device():
         device_type = request.form['device_type']
         device_model = request.form['device_model']
         house_id = request.form['address']
-        response = register_device(house_id, device_type, device_model)
+        response = register_device_home(house_id, device_type, device_model)
         if response[0] == 0:
             failure_msg = response[1]
             flash(failure_msg)
@@ -207,7 +207,7 @@ def deregister_device():
     if request.method == 'POST':
         selected_device_id = request.form['devices']
         # Deregister the selected device from the current user
-        response = deregister_device(selected_device_id)
+        response = deregister_device_home(selected_device_id)
         success_msg = response[1]
         flash(success_msg)
         return redirect(url_for('home'))
@@ -240,8 +240,9 @@ def calculate_charges():
         end_date =str(request.form['end'])
         sd = datetime.strptime(start_date, '%Y-%m-%d')
         ed = datetime.strptime(end_date, '%Y-%m-%d')
-        calculate_charges_cost(sd, ed, selected_address)
-        
+        charges= calculate_charges_cost(sd, ed, selected_address)
+        flash(charges)
+        return redirect(url_for('home'))
         
     response = get_customer_houses(customer_id)
     if response[0] == 0:
@@ -249,7 +250,6 @@ def calculate_charges():
         flash(failure_msg)
         return redirect(url_for('home'))
     address_list = response[1] 
-
     return render_template('calculate_charges.html', addresses=address_list)
 
 @app.route("/generate_consumption_graph_device")

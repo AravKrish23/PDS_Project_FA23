@@ -24,11 +24,15 @@ def calculate_charges_cost(sd, ed, selected_address):
     where pd.timestamp between %s and %s
     and pd.house_id = %s''', ('Energy Use',  sd, ed, selected_address))
     result = cur.fetchall()
-    print(result)
+    
+    if result[0][0] is not None:
+        charges = float(result[0][0])
+    else:
+        charges = 0
     conn.commit()
     cur.close()
     conn.close()
-    return "The Charges for this user is" + str(result)
+    return "The Charges for this user is $" + str(charges) + " during the period between " + str(sd) + " and " + str(ed)
 
 
 def get_house_statistics(sd, ed, selected_address):

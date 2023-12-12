@@ -23,7 +23,7 @@ def get_devices():
     else:
         return [1, device_list]
 
-def register_device(house_id, device_type, device_model):
+def register_device_home(house_id, device_type, device_model):
     conn = psycopg2.connect(database="pds_project", user="postgres", 
         password="password", host="localhost", port="5432") 
         
@@ -38,7 +38,7 @@ def register_device(house_id, device_type, device_model):
     else:
         return [1, "Device Registered, ID is"+str(result)]
 
-def deregister_device(ed_id):
+def deregister_device_home(ed_id):
     
     # Deregister the selected device from the current user
     conn = psycopg2.connect(database="pds_project", user="postgres", 

@@ -60,6 +60,7 @@
     {% if step == 'select_zipcode' %}
         <!-- Step 1: Select Zipcode -->
         <form method="POST" action="{{ url_for('register_address') }}">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
             <label for="zipcode">Select Zipcode:</label>
             <select name="zipcode" required>
                 {% for zipcode in zipcodes %}
@@ -74,7 +75,7 @@
         <!-- Step 2: Select Address within the chosen Zipcode -->
         <form method="POST" action="{{ url_for('register_address') }}">
             <p>Serviceable Addresses in Zipcode: {{ zipcode }}</p>
-        
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
             <label for="unit_number">Unit Number:</label>
             <input type="text" name="unit_number" required>
             <br>

@@ -18,6 +18,7 @@
             <h1>Dynamic Energy Consumption Graph</h1>
 
             <form id="datetimeForm" class="energy-form">
+                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
                 <div class="device-box">
                     <label for="selected_address">Select Address to View:</label>
                     <select id="selected_address" name="selected_address" required>

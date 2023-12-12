@@ -17,6 +17,7 @@
     <h3>Date Time Form</h3>
 
     <form id="datetimeForm">
+        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
         <label for="selected_address">Select Address to View:</label>
         <select id="selected_address" name="selected_address" required>
             <option selected>Choose an option</option>

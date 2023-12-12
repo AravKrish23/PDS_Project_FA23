@@ -13,7 +13,7 @@
         <div class="register-device-box">
             <h1>Deregister Device</h1>
             <form method="POST" action="{{ url_for('deregister_device') }}">
-                {{ csrf_token }}
+                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
                 <div class="device-box">
                     <label for="address">Select Address:</label>
                     <select id="address" name="address" required>

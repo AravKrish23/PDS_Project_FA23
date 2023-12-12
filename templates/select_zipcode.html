@@ -58,6 +58,7 @@
 
     <h2>Select Zipcode</h2>
     <form method="POST" action="{{ url_for('register_address') }}">
+        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
         <label for="zipcode">Select Zipcode:</label>
         <select name="zipcode" required>
             {% for zipcode in zipcodes %}

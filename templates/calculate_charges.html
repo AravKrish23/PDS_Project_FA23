@@ -13,7 +13,7 @@
         <div class="register-device-box">
             <h1>Calculate Electricity Charges</h1>
             <form method="POST" action="{{ url_for('calculate_charges') }}">
-               
+                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
                 <div class="device-box">
                     <label for="selected_address">Select Address:</label>
                     <select name="selected_address" required>

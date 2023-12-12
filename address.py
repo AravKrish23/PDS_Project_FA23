@@ -41,10 +41,12 @@ def register_new_house(customer_id, zipcode, state, city, street, flat_number, u
     street_name, city, state from address where zipcode_id = %s
     and state= %s and city = %s and street_name= %s and flat_number=%s and unit_number=%s''', (zipcode, state, city, street, flat_number, unit_number))
     result = cur.fetchone()
-
     conn.commit()
     cur.close()
-    if len(result) > 0:
+    if result is None:
+        failure_message = [0, "Address is not servicable!"]
+        return failure_message
+    if result is not None:
 
         cur = conn.cursor()
                 
