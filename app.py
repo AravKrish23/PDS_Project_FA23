@@ -44,9 +44,11 @@ def register():
         # Add code for stating the user is created
         if response[0] == 1:
             success_msg = response[1]
+            flash(success_msg)
             return redirect(url_for('login'))
         else:
             failure_msg = response[1]
+            flash(failure_msg)
     return render_template('register.html')
 
 
@@ -90,8 +92,10 @@ def register_address():
             response =  register_new_house(session['customer_id'], zipcode, state, city, street, flat_number, unit_number, is_primary, is_billing)
             if response[0] == 0:
                 failure_message = response[1]
+                flash(failure_message)
             else:
                 success_msg = response[1]
+                flash(success_msg)
             return redirect(url_for('home'))
         
     if session["customer_id"] is None:
@@ -113,10 +117,10 @@ def deregister_address():
         response = deregister_address(customer_id, selected_address_id)
         if response[0] == 0:
             failure_msg = response[1]
-            print(failure_msg)
+            flash(failure_msg)
         else:
             success_msg = response[1]
-            print(success_msg)
+            flash(success_msg)
         return redirect(url_for('home'))
 
 
@@ -124,7 +128,7 @@ def deregister_address():
     response = get_customer_houses(customer_id)
     if response[0] == 0:
         failure_msg = response[1]
-        return failure_msg
+        flash(failure_msg)
     address_list = response[1] 
     return render_template('deregister_address.html', houses=address_list)
 
@@ -145,23 +149,25 @@ def register_device():
         response = register_device(house_id, device_type, device_model)
         if response[0] == 0:
             failure_msg = response[1]
-            return failure_msg
+            flash(failure_msg)
         else:
             success_msg = response[1]
-            print(success_msg)
+            flash(success_msg)
         return redirect(url_for('home'))
 
     
     response = get_customer_houses(customer_id)
     if response[0] == 0:
         failure_msg = response[1]
-        return failure_msg
+        flash(failure_msg)
+        return redirect(url_for('home'))
     address_list = response[1] 
 
     device_response = get_devices()
     if device_response[0] == 0:
         failure_msg = device_response[1]
-        return failure_msg
+        flash(failure_msg)
+        return redirect(url_for('home'))
     device_list = device_response[1]
 
     return render_template('register_device.html', address_list=address_list, device_list=device_list)
@@ -181,14 +187,15 @@ def deregister_device():
         # Deregister the selected device from the current user
         response = deregister_device(selected_device_id)
         success_msg = response[1]
-        print(success_msg)
+        flash(success_msg)
         return redirect(url_for('home'))
     
 
     response = get_customer_houses(customer_id)
     if response[0] == 0:
         failure_msg = response[1]
-        return failure_msg
+        flash(failure_msg)
+        return redirect(url_for('home'))
     address_list = response[1] 
     
     devices_response = get_devices_in_house(address_list)
@@ -216,7 +223,8 @@ def calculate_charges():
     response = get_customer_houses(customer_id)
     if response[0] == 0:
         failure_msg = response[1]
-        return failure_msg
+        flash(failure_msg)
+        return redirect(url_for('home'))
     address_list = response[1] 
 
     return render_template('calculate_charges.html', addresses=address_list)
@@ -231,7 +239,8 @@ def generate_graph_device():
     response = get_customer_houses(customer_id)
     if response[0] == 0:
         failure_msg = response[1]
-        return failure_msg
+        flash(failure_msg)
+        return redirect(url_for('home'))
     address_list = response[1] 
     
     devices_response = get_devices_in_house(address_list)
@@ -249,7 +258,8 @@ def generate_graph():
     response = get_customer_houses(customer_id)
     if response[0] == 0:
         failure_msg = response[1]
-        return failure_msg
+        flash(failure_msg)
+        return redirect(url_for('home'))
     address_list = response[1] 
 
     return render_template('generate_consumption_graph.html', houses=address_list )
@@ -265,7 +275,8 @@ def generate_house_statistics():
     response = get_customer_houses(customer_id)
     if response[0] == 0:
         failure_msg = response[1]
-        return failure_msg
+        flash(failure_msg)
+        return redirect(url_for('home'))
     address_list = response[1] 
     return render_template('generate_house_statistics.html', houses=address_list )
 
@@ -278,7 +289,8 @@ def generate_area_statistics():
     response = get_customer_houses(customer_id)
     if response[0] == 0:
         failure_msg = response[1]
-        return failure_msg
+        flash(failure_msg)
+        return redirect(url_for('home'))
     address_list = response[1] 
     return render_template('generate_area_statistics.html', houses=address_list )
 

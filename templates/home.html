@@ -8,7 +8,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='user/css/home.css') }}">
 </head>
 <body>
-
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <script>
+        var messages = {{ messages | safe }};
+        for (var i=0; i<messages.length; i++) {
+        alert(messages[i]);
+        console.log(messages[i]);
+        }
+    </script>
+    {% endif %}
+{% endwith %}
 {% include 'navbar.html' %}
 
 <div class="container">
@@ -16,6 +26,7 @@
         <img src="{{ url_for('static', filename='home1.jpeg') }}" alt="Home Image" style="max-width: 100%;">
     </div>
     <div class="left">
+        
         <h2>Welcome to the Home Page {{customer_id}}</h2>
         <p>Choose an option:</p>
         <ul>

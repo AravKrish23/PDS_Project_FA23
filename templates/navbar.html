@@ -92,11 +92,11 @@
 
     <div class="sidebar">
         <a href="#" onclick="toggleSidebar()"></a>
-        <a href="#{{ url_for('calculate_charges') }}">Calculate Charges</a>
-        <a href="#{{ url_for('register_address') }}">Register Address</a>
-        <a href="#{{ url_for('register_device') }}">Register Device</a>
-        <a href="#{{ url_for('deregister_address') }}">Deregister Address</a>
-        <a href="#{{ url_for('deregister_device') }}">Deregister Device</a>
+        <a href="{{ url_for('calculate_charges') }}">Calculate Charges</a>
+        <a href="{{ url_for('register_address') }}">Register Address</a>
+        <a href="{{ url_for('register_device') }}">Register Device</a>
+        <a href="{{ url_for('deregister_address') }}">Deregister Address</a>
+        <a href="{{ url_for('deregister_device') }}">Deregister Device</a>
         <a href="#">Usage Statistics</a>
         <div class="sub-menu">
             <a href="#">Generate Area Statistics</a>
