@@ -76,33 +76,29 @@
     <div class="header">
         <div class="open-btn" onclick="toggleSidebar()">☰</div>
 
-        <a class="text-decoration-none text-white" href="{{ url_for('home') }}"><span>SHMS</span></a>
+        <a class="text-decoration-none text-white" href="{{ url_for('home') }}"><span>Smart Home Energy Management System</span></a>
 
         <!-- Replace the following logic with your authentication status check -->
-        {% if user_is_logged_in %}
+     
         <nav>
             <a href="{{ url_for('logout') }}">Logout</a>
         </nav>
-        {% else %}
-        <nav>
-            <a href="{{ url_for('login') }}">Login</a>
-        </nav>
-        {% endif %}
+       
     </div>
 
     <div class="sidebar">
         <a href="#" onclick="toggleSidebar()"></a>
-        <a href="#{{ url_for('calculate_charges') }}">Calculate Charges</a>
-        <a href="#{{ url_for('register_address') }}">Register Address</a>
-        <a href="#{{ url_for('register_device') }}">Register Device</a>
-        <a href="#{{ url_for('deregister_address') }}">Deregister Address</a>
-        <a href="#{{ url_for('deregister_device') }}">Deregister Device</a>
-        <a href="#">Usage Statistics</a>
+        <a href="{{ url_for('calculate_charges') }}">Calculate Charges</a>
+        <a href="{{ url_for('register_address') }}">Register Address</a>
+        <a href="{{ url_for('register_device') }}">Register Device</a>
+        <a href="{{ url_for('deregister_address') }}">Deregister Address</a>
+        <a href="{{ url_for('deregister_device') }}">Deregister Device</a>
+        <a href="">Usage Statistics</a>
         <div class="sub-menu">
-            <a href="#">Generate Area Statistics</a>
-            <a href="#">Generate Consumption Graph for Devices</a>
-            <a href="#">Generate Consumption Graph</a>
-            <a href="#">Generate House Statistics</a>
+            <a href="#{{ url_for('deregister_device') }}">Generate Area Statistics</a>
+            <a href="#{{ url_for('deregister_device') }}">Generate Consumption Graph for Devices</a>
+            <a href="#{{ url_for('deregister_device') }}">Generate Consumption Graph</a>
+            <a href="#{{ url_for('deregister_device') }}">Generate House Statistics</a>
             <!-- Add more sub-options as needed -->
         </div>
         <!-- Add more options as needed -->
