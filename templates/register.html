@@ -36,12 +36,12 @@
                 </div>
                 <div class="user-box">
                     <label for="phone">Phone:</label>
-                    <input type="tel" name="phone" id="phone" required>
+                    <input type="tel" name="phone" id="phone"  pattern="[0-9]{10}" title="Enter a valid 10 digit number" required>
                     <span id="phoneError" class="error"></span>
                 </div>
                 <div class="user-box">
                     <label for="password">Password:</label>
-                    <input type="password" name="password" id="password" required>
+                    <input type="password" name="password" id="password"  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Ensure atleast 8 characters, 1 Uppercase, 1 lowercase and 1 special character" required>
                     <span id="passwordError" class="error"></span>
                 </div>
                 <div id="errorMessages" class="error"></div>
