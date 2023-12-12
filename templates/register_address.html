@@ -8,7 +8,7 @@
         body {
             font-family: sans-serif;
             background-color: #ebf1f3;
-            color: #000;
+            color: #fff;
             margin: 0;
             padding: 20px;
             text-align: center;
@@ -17,7 +17,7 @@
         }
 
         h2 {
-            color:#000 ;
+            color: #000;
             margin-bottom: 20px;
         }
 
@@ -50,6 +50,10 @@
             padding: 8px;
             margin-bottom: 10px;
             box-sizing: border-box;
+        }
+
+        p {
+            color: #fff; /* Set text color to white */
         }
 
         button {
@@ -85,23 +89,23 @@
         <!-- Step 2: Select Address within the chosen Zipcode -->
         <form method="POST" action="{{ url_for('register_address') }}">
             <p>Serviceable Addresses in Zipcode: {{ zipcode }}</p>
-        
+
             <label for="unit_number">Unit Number:</label>
             <input type="text" name="unit_number" required>
             <br>
-    
+
             <label for="flat_number">Flat Number:</label>
             <input type="text" name="flat_number" required>
             <br>
-    
+
             <label for="street">Street:</label>
             <input type="text" name="street" required>
             <br>
-    
+
             <label for="city">City:</label>
             <input type="text" name="city" required>
             <br>
-    
+
             <label for="state">State:</label>
             <input type="text" name="state" required>
             <br>
