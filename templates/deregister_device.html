@@ -1,60 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deregister Device</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/register_device.css') }}">
+</head>
 <body>
-    <div class="deregister-device-container">
-        <div class="deregister-device-box">
+    <div class="register-device-container">
+        <div class="register-device-box">
             <h1>Deregister Device</h1>
             <form method="POST" action="{{ url_for('deregister_device') }}">
                 {{ csrf_token }}
-
                 <div class="device-box">
                     <label for="address">Select Address:</label>
                     <select id="address" name="address" required>
-                        <option selected disbaled>Choose an option</option>
+                        <option selected disabled>Choose an option</option>
                         {% for add in addresses %}
                         <option value="{{add.HouseID}}">{{add.address}}</option>
                         {% endfor %}
                     </select>
                 </div>
-
                 <div class="device-box">
                     <label for="devices">Device :</label>
                     <select id="devices" name="devices" required>
                     </select>
                 </div>
-
                 <button type="submit">Deregister Device</button>
             </form>
         </div>
     </div>
-</body>
+
     <script type="text/javascript">
 
-    function myFunc(vars) {
-        return vars
-    }
-    
-     document.getElementById("address").onchange = function(evt){
-        var value = evt.target.value;
-        console.log(value);
-        device_list = myFunc({{devices_house|tojson}});
-        console.log(device_list)
-        var select = document.getElementById("devices");
-        options = device_list[value];
-        console.log(options)
-        for(var key in options) 
-        {
-            var el = document.createElement("option");
-            el.text  = options[key];
-            el.value = key;
-            select.appendChild(el);
+        function myFunc(vars) {
+            return vars
         }
         
-     };
-    
+        document.getElementById("address").onchange = function(evt){
+            var value = evt.target.value;
+            console.log(value);
+            device_list = myFunc({{devices_house|tojson}});
+            console.log(device_list)
+            var select = document.getElementById("devices");
+            options = device_list[value];
+            console.log(options)
+            // Clear existing options
+            select.innerHTML = "";
+            for(var key in options) 
+            {
+                var el = document.createElement("option");
+                el.text  = options[key];
+                el.value = key;
+                select.appendChild(el);
+            }
+            
+         };
+        
     </script>
-    
+</body>
 </html>
-
-

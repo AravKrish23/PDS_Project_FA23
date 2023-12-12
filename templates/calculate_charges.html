@@ -4,22 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculate Electricity Charges</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/register_device.css') }}">
 </head>
 <body>
-    <h2>Calculate Electricity Charges</h2>
-    <form method="POST" action="{{ url_for('calculate_charges') }}">
-        <label for="selected_address">Select Address:</label>
-        <select name="selected_address" required>
-            {% for address in addresses %}
-                <option value="{{ address.HouseID }}">{{ address.address }} </option>
-            {% endfor %}
-        </select>
-        <label for="start">Start date:</label>
-            <input type="date" id="start" name="start" value="2023-11-30" min="2000-01-01" max="2060-12-31" />
-        <label for="start">End date:</label>
-            <input type="date" id="end" name="end" value="2023-11-30" min="2000-01-01" max="2060-12-31" />
-        <br>
-        <button type="submit">Calculate Charges</button>
-    </form>
+    <div class="register-device-container">
+        <div class="register-device-box">
+            <h1>Calculate Electricity Charges</h1>
+            <form method="POST" action="{{ url_for('calculate_charges') }}">
+               
+                <div class="device-box">
+                    <label for="selected_address">Select Address:</label>
+                    <select name="selected_address" required>
+                        {% for address in addresses %}
+                            <option value="{{ address.HouseID }}">{{ address.address }} </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="device-box">
+                    <label for="start">Start date:</label>
+                    <input type="date" id="start" name="start" value="2023-11-30" min="2000-01-01" max="2060-12-31" />
+                </div>
+                <div class="device-box">
+                    <label for="end">End date:</label>
+                    <input type="date" id="end" name="end" value="2023-11-30" min="2000-01-01" max="2060-12-31" />
+                </div>
+                <button type="submit">Calculate Charges</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

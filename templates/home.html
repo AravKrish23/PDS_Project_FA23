@@ -8,19 +8,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='user/css/home.css') }}">
 </head>
 <body>
-    <div class="container">
-        <div class="left">
-            <img src="{{ url_for('static', filename='home1.jpeg') }}" alt="Home Image" style="max-width: 100%;">
-        </div>
-    <div class="container">
-        <div class="left">
-            <h2>Welcome to the Home Page {{customer_id}}</h2>
-            <p>Choose an option:</p>
-            <ul>
-                <li><a href="{{ url_for('register_device') }}">Register a Device</a></li>
-                <li><a href="{{ url_for('register_address') }}">Register an Address</a></li>
-            </ul>
-        </div>
+
+{% include 'navbar.html' %}
+
+<div class="container">
+    <div class="left">
+        <img src="{{ url_for('static', filename='home1.jpeg') }}" alt="Home Image" style="max-width: 100%;">
     </div>
+    <div class="left">
+        <h2>Welcome to the Home Page {{customer_id}}</h2>
+        <p>Choose an option:</p>
+        <ul>
+            <li><a href="{{ url_for('register_device') }}">Register a Device</a></li>
+            <li><a href="{{ url_for('register_address') }}">Register an Address</a></li>
+        </ul>
+    </div>
+</div>
+
 </body>
 </html>
