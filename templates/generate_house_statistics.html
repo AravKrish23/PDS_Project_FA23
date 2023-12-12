@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Energy Consumption Graph</title>
+    <link rel="stylesheet" href="generate_energy_consumption_graph.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
+
 <body>
+
+{% include 'navbar.html' %}
     <h2>Dynamic Energy Consumption Graph</h2>
     <h3>Date Time Form</h3>
-    
+
     <form id="datetimeForm">
         <label for="selected_address">Select Address to View:</label>
-        <select id = "selected_address" name="selected_address" required>
+        <select id="selected_address" name="selected_address" required>
             <option selected>Choose an option</option>
             {% for house in houses %}
-                <option value="{{ house.HouseID }}">{{ house.address }}</option>
+            <option value="{{ house.HouseID }}">{{ house.address }}</option>
             {% endfor %}
         </select>
         <br>
@@ -29,86 +34,93 @@
         <br>
         <br>
 
-        <input type ="submit" id="EC" value="Get EC Chart" >
+        <input type="submit" id="EC" value="Get EC Chart">
     </form>
-    
 
     <div id="energy-consumption-chart"></div>
     <div id="device-type-consumption-chart"></div>
+
     <script>
-        // Function to update the chart with new data
-        $(document).ready(function() 
-        {
+        $(document).ready(function () {
             var chosenGraph;
-            $("#datetimeForm").submit(function(event) {
+
+            $("#datetimeForm").submit(function (event) {
                 event.preventDefault();
-                console.log(buttonClicked);
+
+                if (!validateDates()) {
+                    alert("Start date must be before end date.");
+                    return;
+                }
+
                 var startDatetime = $("#startDatetime").val();
                 var endDatetime = $("#endDatetime").val();
-                var selected_address= $("#selected_address").val();
+                var selected_address = $("#selected_address").val();
                 chosenGraph = buttonClicked;
-                buttonClicked=""; 
-                console.log("getting Here! 21");
+                buttonClicked = "";
+
                 $.ajax({
                     url: '/get_house_statistics',
                     type: 'POST',
-                    data: {startDatetime: startDatetime, endDatetime: endDatetime, selected_address:selected_address},
-                    success: function(response) 
-                    {
-                        // Update the table with the response data
-                        console.log("getting Here! 22");
-                                // Initial chart setup
-
+                    data: {
+                        startDatetime: startDatetime,
+                        endDatetime: endDatetime,
+                        selected_address: selected_address
+                    },
+                    success: function (response) {
+                        console.log("Getting Here! 22");
                         updateGraph(response);
                     },
-                    error: function(error) {
+                    error: function (error) {
                         console.log('Error:', error);
                     }
                 });
             });
-            $("#datetimeForm input[type = 'submit']").click(function(e){
+
+            function validateDates() {
+                var startDatetime = new Date($("#startDatetime").val());
+                var endDatetime = new Date($("#endDatetime").val());
+
+                // Check if start date is before end date
+                return startDatetime < endDatetime;
+            }
+
+            $("#datetimeForm input[type='submit']").click(function (e) {
                 buttonClicked = $(this).attr("id");
-                console.log
-            })
+            });
 
             function updateGraph(response) {
-            // Extract x and y data from the response
-            var labels = response.labels;
-            var values = response.values;
-            var l2 = response.device_types;
-            var v2 = response.device_type_values;
+                var labels = response.labels;
+                var values = response.values;
+                var l2 = response.device_types;
+                var v2 = response.device_type_values;
 
-            var plotlyData = [{
-                values: values  ,
-                labels: labels,
-                type: 'pie',
-                hole: 0.4
-                
-            }];
+                var plotlyData = [{
+                    values: values,
+                    labels: labels,
+                    type: 'pie',
+                    hole: 0.4
+                }];
 
-            var plotlyData2 = [{
-                values: v2,
-                labels: l2,
-                type: 'pie',
-                hole: 0.4
-                
-            }];
-            
-            
-            var layout = {
-                        title: 'Energy Consumption By Device',
-                    };
-        
-            var layout2 = {
-                        title: 'Energy Consumption By Device Type',
-                    };
+                var plotlyData2 = [{
+                    values: v2,
+                    labels: l2,
+                    type: 'pie',
+                    hole: 0.4
+                }];
 
-            // Update the Plotly graph
-            Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
-            Plotly.newPlot('device-type-consumption-chart', plotlyData2, layout2);
-        }
+                var layout = {
+                    title: 'Energy Consumption By Device',
+                };
+
+                var layout2 = {
+                    title: 'Energy Consumption By Device Type',
+                };
+
+                Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
+                Plotly.newPlot('device-type-consumption-chart', plotlyData2, layout2);
+            }
         });
-
     </script>
 </body>
+
 </html>

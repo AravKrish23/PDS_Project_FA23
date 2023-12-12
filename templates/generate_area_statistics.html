@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Energy Consumption Graph</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/register_device.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/get_area_statistics.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
+
 <body>
+
+{% include 'navbar.html' %}
     <div class="register-device-container">
         <div class="register-device-box">
             <h1>Dynamic Energy Consumption Graph</h1>
@@ -50,21 +54,24 @@
 
             $("#datetimeForm").submit(function (event) {
                 event.preventDefault();
-                console.log(buttonClicked);
+
+                if (!validateDates()) {
+                    alert("Start date must be before end date.");
+                    return;
+                }
+
                 var startDatetime = $("#startDatetime").val();
                 var endDatetime = $("#endDatetime").val();
                 var selected_address = $("#selected_address").val();
                 chosenGraph = buttonClicked;
                 buttonClicked = "";
-                console.log("getting Here! 21");
+
                 $.ajax({
                     url: '/get_area_statistics',
                     type: 'POST',
                     data: {startDatetime: startDatetime, endDatetime: endDatetime, selected_address: selected_address},
                     success: function (response) {
-                        // Update the table with the response data
-                        console.log("getting Here! 22");
-                        // Initial chart setup
+                        console.log("Getting Here! 22");
                         updateGraph(response);
                     },
                     error: function (error) {
@@ -73,45 +80,49 @@
                 });
             });
 
+            function validateDates() {
+                var startDatetime = new Date($("#startDatetime").val());
+                var endDatetime = new Date($("#endDatetime").val());
+
+                // Check if start date is before end date
+                return startDatetime < endDatetime;
+            }
+
             $("#datetimeForm input[type='submit']").click(function (e) {
                 buttonClicked = $(this).attr("id");
-                console.log;
             });
 
             function updateGraph(response) {
-            // Extract x and y data from the response
-            var labels = response.labels;
-            var values = response.percentage_of_total;
-            var avg_usage = response.avg_above;
-            var own_consumption = response.own_consumption;
+                var labels = response.labels;
+                var values = response.percentage_of_total;
+                var avg_usage = response.avg_above;
+                var own_consumption = response.own_consumption;
 
-            var plotlyData = [{
-                values: values  ,
-                labels: labels,
-                type: 'pie',
-                hole: 0.4
-                
-            }];
-                        
-            var layout = {
-                        title: 'Energy Consumption By Your Household in this period',
-                    };
+                var plotlyData = [{
+                    values: values,
+                    labels: labels,
+                    type: 'pie',
+                    hole: 0.4
+                }];
 
-            // Update the Plotly graph
-            Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
+                var layout = {
+                    title: 'Energy Consumption By Your Household in this period',
+                };
 
-            var consumptionData = "Your Energy Consumption for this period is: " + String(own_consumption)
-            var statText = "Compared to other houses of similar size in this zipcode, your house used "
-            console.log(avg_usage)
-                    
-            if(avg_usage > 0)
-                statText += String(avg_usage) + " more units in this time period"
-            else
-                statText += String(Math.abs(avg_usage)) + " less units in this time period"  
+                Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
 
-            document.getElementById("Statistics").innerHTML = statText;
-            document.getElementById("Consumption").innerHTML = consumptionData;
-        }
+                var consumptionData = "Your Energy Consumption for this period is: " + String(own_consumption)
+                var statText = "Compared to other houses of similar size in this zipcode, your house used "
+                console.log(avg_usage)
+
+                if (avg_usage > 0)
+                    statText += String(avg_usage) + " more units in this time period"
+                else
+                    statText += String(Math.abs(avg_usage)) + " less units in this time period"
+
+                document.getElementById("Statistics").innerHTML = statText;
+                document.getElementById("Consumption").innerHTML = consumptionData;
+            }
         });
     </script>
 </body>

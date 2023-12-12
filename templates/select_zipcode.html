@@ -53,6 +53,9 @@
     </style>
 </head>
 <body>
+
+{% include 'navbar.html' %}
+
     <h2>Select Zipcode</h2>
     <form method="POST" action="{{ url_for('register_address') }}">
         <label for="zipcode">Select Zipcode:</label>

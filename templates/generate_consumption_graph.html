@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,10 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
+
 <body>
+
+{% include 'navbar.html' %}
     <div class="register-device-container">
         <div class="register-device-box">
             <h1>Dynamic Energy Consumption Graph</h1>
@@ -63,14 +67,19 @@
 
             $("#datetimeForm").submit(function (event) {
                 event.preventDefault();
-                console.log(buttonClicked);
+
+                if (!validateDates()) {
+                    alert("Start date must be before end date.");
+                    return;
+                }
+
                 var startDatetime = $("#startDatetime").val();
                 var endDatetime = $("#endDatetime").val();
                 var selected_address = $("#selected_address").val();
                 var dateLevel = document.querySelector('input[name="dateLevel"]:checked').value;
                 chosenGraph = buttonClicked;
                 buttonClicked = "";
-                console.log("getting Here! 21");
+
                 $.ajax({
                     url: '/get_consumption_data',
                     type: 'POST',
@@ -82,9 +91,7 @@
                         chosenGraph: chosenGraph
                     },
                     success: function (response) {
-                        // Update the table with the response data
-                        console.log("getting Here! 22");
-                        // Initial chart setup
+                        console.log("Getting Here! 22");
                         updateGraph(response);
                     },
                     error: function (error) {
@@ -93,13 +100,19 @@
                 });
             });
 
+            function validateDates() {
+                var startDatetime = new Date($("#startDatetime").val());
+                var endDatetime = new Date($("#endDatetime").val());
+
+                // Check if start date is before end date
+                return startDatetime < endDatetime;
+            }
+
             $("#datetimeForm input[type='submit']").click(function (e) {
                 buttonClicked = $(this).attr("id");
-                console.log;
             });
 
             function updateGraph(response) {
-                // Extract x and y data from the response
                 var xData = response.dates;
                 var yData = response.values;
 
@@ -110,21 +123,12 @@
                     marker: {color: 'blue'},
                 }];
 
-                if (chosenGraph === "EC") {
-                    var layout = {
-                        title: 'Dynamic Energy Consumption Over Time',
-                        xaxis: {title: 'Date'},
-                        yaxis: {title: 'Energy Consumption (kWh)'}
-                    };
-                } else {
-                    var layout = {
-                        title: 'Dynamic Price Chart Over Time',
-                        xaxis: {title: 'Date'},
-                        yaxis: {title: 'Total Charge'}
-                    };
-                }
+                var layout = {
+                    title: (chosenGraph === "EC") ? 'Dynamic Energy Consumption Over Time' : 'Dynamic Price Chart Over Time',
+                    xaxis: {title: 'Date'},
+                    yaxis: (chosenGraph === "EC") ? {title: 'Energy Consumption (kWh)'} : {title: 'Total Charge'}
+                };
 
-                // Update the Plotly graph
                 Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
             }
         });
