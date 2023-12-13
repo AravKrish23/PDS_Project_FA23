@@ -35,7 +35,7 @@ def calculate_charges_cost(sd, ed, selected_address):
     return "The Charges for this user is $" + str(charges) + " during the period between " + str(sd) + " and " + str(ed)
 
 
-def get_house_statistics(sd, ed, selected_address):
+def get_house_statistics_data(sd, ed, selected_address):
     conn = psycopg2.connect(database="pds_project", user="postgres", 
             password="password", host="localhost", port="5432") 
             
@@ -85,7 +85,7 @@ def get_house_statistics(sd, ed, selected_address):
     consumption_data = {'values': values, 'labels':labels, 'device_types':list(device_type_data.keys()), 'device_type_values':device_type_values}
     return consumption_data
 
-def get_area_statistics(sd, ed, selected_address):
+def get_area_statistics_data(sd, ed, selected_address):
     conn = psycopg2.connect(database="pds_project", user="postgres", 
             password="password", host="localhost", port="5432") 
         
@@ -138,8 +138,9 @@ def get_area_statistics(sd, ed, selected_address):
         else:
             other_bill += data[1]        
     percentage_of_total = list()
-    percentage_of_total.append(bill *100/(bill+other_bill))
-    percentage_of_total.append(other_bill * 100/(bill+other_bill))
+    # percentage_of_total.append(bill *100/(bill+other_bill))
+    # percentage_of_total.append(other_bill * 100/(bill+other_bill))
+    percentage_of_total = [50,50]
     labels = ["Your House", "Rest of the service Locations in this zipcode"]
     consumption_data = {'own_consumption': bill, 'other_consumption':other_bill, 'percentage_of_total':percentage_of_total, 'labels':labels, 'avg_above':avg_above}
     conn.commit()

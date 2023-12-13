@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Energy Consumption Graph</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/get_area_statistics.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/generate_area_statistics.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
@@ -52,6 +52,16 @@
     <script>
         $(document).ready(function () {
             var chosenGraph;
+
+            var csrf_token = "{{ csrf_token() }}";
+
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
 
             $("#datetimeForm").submit(function (event) {
                 event.preventDefault();

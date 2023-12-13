@@ -9,11 +9,12 @@ from register_validate import check_and_create_user
 from login_validate import check_login
 from address import register_new_house, get_customer_houses, deregister_address
 from devices import get_devices, register_device_home,deregister_device_home, get_devices_in_house
-from graph_queries import get_house_consumption_data, get_device_consumption_data, get_area_statistics, get_house_statistics, calculate_charges_cost
+from graph_queries import get_house_consumption_data, get_device_consumption_data, get_area_statistics_data, get_house_statistics_data, calculate_charges_cost
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '12345678'
+app.config['SESSION_COOKIE_SECURE'] = False
 app.permanent_session_lifetime = timedelta(minutes=90)
 csrf = CSRFProtect(app)
 
@@ -177,7 +178,7 @@ def register_device():
 
     
     response = get_customer_houses(customer_id)
-    print(response)
+    
     if response[0] == 0:
         failure_msg = response[1]
         flash(failure_msg)
@@ -328,6 +329,7 @@ def get_consumption_data():
         return render_template('login.html')
     
     if request.method == 'POST':
+        print("Got Here!")
         sd = request.form['startDatetime']
         ed = request.form['endDatetime'] 
         level = request.form['dateLevel']
@@ -362,7 +364,7 @@ def get_house_statistics():
         sd = request.form['startDatetime']
         ed = request.form['endDatetime'] 
         selected_address = request.form['selected_address']
-        house_statistics = get_house_statistics(sd, ed, selected_address)
+        house_statistics = get_house_statistics_data(sd, ed, selected_address)
         return jsonify(house_statistics)    
 
 @app.route("/get_area_statistics",  methods=['GET', 'POST'])
@@ -377,7 +379,7 @@ def get_area_statistics():
         sd = request.form['startDatetime']
         ed = request.form['endDatetime'] 
         selected_address = request.form['selected_address']
-        area_stats = get_area_statistics(sd, ed, selected_address)
+        area_stats = get_area_statistics_data(sd, ed, selected_address)
         return jsonify(area_stats)    
 
 
