@@ -5,20 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Energy Consumption Graph</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/generate_consumption_graph.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='generate_consumption_graph_devices.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 
 <body>
 
-{% include 'navbar.html' %}
+    {% include 'navbar.html' %}
+
     <div class="register-device-container">
         <div class="register-device-box">
             <h1>Dynamic Energy Consumption Graph</h1>
 
             <form id="datetimeForm" class="energy-form">
-                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <div class="device-box">
                     <label for="selected_address">Select Address to View:</label>
                     <select id="selected_address" name="selected_address" required>
@@ -82,13 +83,13 @@
                 buttonClicked = "";
 
                 $.ajax({
-                    url: '/get_consumption_data',
+                    url: '/get_consumption_data_device',
                     type: 'POST',
                     data: {
-                        startDatetime: startDatetime, 
-                        endDatetime: endDatetime, 
-                        selected_address: selected_address, 
-                        dateLevel: dateLevel, 
+                        startDatetime: startDatetime,
+                        endDatetime: endDatetime,
+                        selected_address: selected_address,
+                        dateLevel: dateLevel,
                         chosenGraph: chosenGraph
                     },
                     success: function (response) {
@@ -121,13 +122,13 @@
                     x: xData,
                     y: yData,
                     type: 'bar',
-                    marker: {color: 'blue'},
+                    marker: { color: 'blue' },
                 }];
 
                 var layout = {
                     title: (chosenGraph === "EC") ? 'Dynamic Energy Consumption Over Time' : 'Dynamic Price Chart Over Time',
-                    xaxis: {title: 'Date'},
-                    yaxis: (chosenGraph === "EC") ? {title: 'Energy Consumption (kWh)'} : {title: 'Total Charge'}
+                    xaxis: { title: 'Date' },
+                    yaxis: (chosenGraph === "EC") ? { title: 'Energy Consumption (kWh)' } : { title: 'Total Charge' }
                 };
 
                 Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
@@ -135,4 +136,5 @@
         });
     </script>
 </body>
+
 </html>
