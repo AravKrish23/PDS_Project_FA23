@@ -15,20 +15,17 @@ body {
 
 .register-device-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between; /* Adjusted to create space between the form and graph */
+    align-items: flex-start;
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-    flex-direction: column;
 }
 
 .register-device-box {
-    width: 100%; /* Increased the width */
-    min-width: 300px;
-    max-width: 600px; /* Adjusted the max-width */
+    width: 48%;
     padding: 40px;
-    margin-top: 290px;
+    margin-top: 20px; /* Adjusted the margin-top to provide space between the form and the top */
     background-color: #0a2049;
     box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
     border-radius: 10px;
@@ -37,13 +34,12 @@ body {
 .register-device-box h1,
 .register-device-box h2,
 .register-device-box label {
-    color: #fff; /* Set text color to white */
+    color: #fff;
 }
 
 .device-box input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }
-
 
 .device-box {
     margin-bottom: 20px;
@@ -76,7 +72,6 @@ body {
     text-decoration: none;
     text-transform: uppercase;
     transition: 0.5s;
-    margin-top: 20px;
     letter-spacing: 4px;
     width: 100%;
 }
@@ -87,6 +82,6 @@ body {
 }
 
 .plotly-chart {
-    width: 100%;
+    width: 48%; /* Adjusted width */
     max-width: 800px;
 }

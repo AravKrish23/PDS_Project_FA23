@@ -4,62 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Device</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/register_device.css') }}">
 
-        h1 {
-            color: #008080;
-        }
-
-        .register-device-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .register-device-box {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 300px;
-        }
-
-        .device-box {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-
-        button {
-            background-color: #008080;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
 
@@ -68,7 +14,7 @@
         <div class="register-device-box">
             <h1>Register Device</h1>
             <form method="POST" action="{{ url_for('register_device') }}">
-                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /> 
              
                 <div class="device-box">
                     <label for="device_type">Device Type:</label>

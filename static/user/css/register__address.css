@@ -1,64 +1,75 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #ebf1f3;
-    color: #333;  /* Changed to a darker color for better readability */
+    font-family: sans-serif;
+    background: #ebf1f3;
     margin: 0;
-    padding: 20px;
-    text-align: center;
+    padding: 0;
     display: flex;
     justify-content: center;
-}
-
-h2 {
-    color: #008080;
-    margin-bottom: 20px;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
+    width: 40%;
+    min-width: 300px;
+    max-width: 500px;
+    padding: 40px;
+    background-color: #0a2049;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+}
+
+h2 {
+    color: #fff;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 form {
-    width: 300px;
     text-align: left;
     margin-top: 20px;
-    padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 label {
     display: block;
     margin-bottom: 5px;
-    color: #333;
+    color: #fff;
 }
 
 input,
 select {
     width: 100%;
-    padding: 8px;
+    padding: 10px; /* Adjusted for consistency on all sides */
+    font-size: 16px;
+    color: #fff;
     margin-bottom: 10px;
-    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #fff;
+    outline: none;
+    background: transparent;
 }
 
 p {
-    color: #333;
+    color: #fff;
 }
 
 button.register-button {
-    background-color: #008080;
-    color: #fff;
     padding: 10px 20px;
+    color: #fff;
+    background-color: rgb(114, 195, 241);
+    font-size: 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background 0.5s;
+    margin-top: 20px;
+    letter-spacing: 4px;
+    width: 100%;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 button.register-button:hover {
-    background: #006666;
+    background: rgb(43, 158, 235);
+    border-radius: 5px;
 }

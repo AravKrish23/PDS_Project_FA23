@@ -7,12 +7,12 @@ body {
 
 .register-device-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between; /* Changed to space-between to place items at both ends */
     align-items: center;
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-    flex-direction: column;
+    flex-direction: row; /* Changed to row for horizontal alignment */
 }
 
 .register-device-box {

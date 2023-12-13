@@ -5,14 +5,15 @@ body {
     background: #ebf1f3;
 }
 
+
 .register-device-container {
     display: flex;
-    justify-content: center; /* Center the form horizontally */
+    justify-content: space-between; /* Changed to space-between to place items at both ends */
     align-items: center;
-    min-height: 100vh; 
+    min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-    flex-direction: column; /* Align items vertically */
+    flex-direction: row; /* Changed to row for horizontal alignment */
 }
 
 .register-device-box {
@@ -20,7 +21,7 @@ body {
     min-width: 300px;
     max-width: 500px;
     padding: 40px;
-    margin-top: 20px; /* Add margin at the top for spacing */
+    margin-top: 20px;
     background-color: #0a2049;
     box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
     border-radius: 10px;

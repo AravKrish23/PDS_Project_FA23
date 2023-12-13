@@ -7,15 +7,25 @@ body {
 
 .register-device-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+    align-items: flex-start;
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
+    overflow: hidden;
+}
+
+.form-container {
+    width: 48%;
+}
+
+.graph-container {
+    width: 48%;
+    margin-left: 4%;
 }
 
 .register-device-box {
-    width: 60%;
+    width: 100%;
     min-width: 300px;
     max-width: 600px;
     padding: 40px;
@@ -75,7 +85,7 @@ body {
 
 .plotly-chart {
     width: 100%;
-    max-width: 800px;
+    max-width: 100%;
 }
 
 #Consumption,
@@ -84,7 +94,12 @@ body {
     margin-top: 20px;
 }
 
-
 .device-box input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
+}
+
+/* Add this style for the navigation bar */
+.navbar {
+    position: relative;
+    z-index: 2; /* Higher z-index to bring it in front */
 }
