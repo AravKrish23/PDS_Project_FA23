@@ -47,7 +47,13 @@
         <div class="graph-container">
             <div id="energy-consumption-chart" class="plotly-chart"></div>
             <div id="device-type-consumption-chart" class="plotly-chart"></div>
+            <div class="data-container">
+                <div id="usage_statistics"></div>
+                <div id="average_statistics"></div>
+                <div id="table-data"></div>
+            </div>
         </div>
+
     </div>
 
     <script>
@@ -84,6 +90,7 @@
                     success: function (response) {
                         console.log("Getting Here! 22");
                         updateGraph(response);
+                        generateTable(response)
                     },
                     error: function (error) {
                         console.log('Error:', error);
@@ -130,9 +137,44 @@
                 else
                     statText += String(Math.abs(avg_usage)) + " less units in this time period";
     
-                document.getElementById("Statistics").innerHTML = statText;
-                document.getElementById("Consumption").innerHTML = consumptionData;
+                document.getElementById("usage_statistics").innerHTML = statText;
+                document.getElementById("average_statistics").innerHTML = consumptionData;
             }
+
+            function generateTable(data) {
+                
+                    var container = document.getElementById('table-data');
+                    var table = document.createElement('table');
+                    var thead = document.createElement('thead');
+                    var tbody = document.createElement('tbody');
+                    container.innerHTML = ''
+                    device_wise_stats = data.device_wise_stats;
+
+                    var headerRow = document.createElement('tr');
+                    var labels = ['Device Type', 'Total Charge for the Time Period ($)', '% change from average', 'Usage Rank in Zipcode']
+                    labels.forEach(function(key) {
+                        var th = document.createElement('th');
+                        th.textContent = key;
+                        headerRow.appendChild(th);
+                    });
+                    thead.appendChild(headerRow);
+                    table.appendChild(thead);
+
+                    device_wise_stats.forEach(function(item) {
+                    var row = document.createElement('tr');
+                    Object.values(item).forEach(function(value) {
+                        var cell = document.createElement('td');
+                        cell.textContent = value;
+                        console.log(value);
+                        row.appendChild(cell);
+                        });
+                        tbody.appendChild(row);
+                    });
+                    table.appendChild(tbody);
+
+                    // Append the table to the container
+                    container.appendChild(table);
+                 }
         });
     </script>
     

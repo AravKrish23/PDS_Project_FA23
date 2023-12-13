@@ -142,6 +142,7 @@
                 console.log(device_list)
                 var select = document.getElementById("devices");
                 options = device_list[value];
+                select.innerHTML="";
                 console.log(options)
                 for (var key in options) {
                     var el = document.createElement("option");

@@ -130,9 +130,6 @@ def get_area_statistics_data(sd, ed, selected_address):
     print(result)
     device_stats = get_area_statistics_data_by_device(result_zipcode, sd, ed, selected_address)
 
-    device_wise_stats = list()
-    for device in device_stats:
-        device_wise_stats.append(device)
 
     print(device_stats)
     other_bill = 0
@@ -148,7 +145,7 @@ def get_area_statistics_data(sd, ed, selected_address):
     print(other_bill, bill)
     percentage_of_total= [bill, other_bill]
     labels = ["Your House", "Rest of the service Locations in this zipcode"]
-    consumption_data = {'own_consumption': bill, 'other_consumption':other_bill, 'percentage_of_total':percentage_of_total, 'labels':labels, 'avg_above':avg_above, 'device_wise_stats':device_wise_stats}
+    consumption_data = {'own_consumption': bill, 'other_consumption':other_bill, 'percentage_of_total':percentage_of_total, 'labels':labels, 'avg_above':avg_above, 'device_wise_stats':device_stats}
     conn.commit()
     cur.close()
     conn.close()
@@ -199,13 +196,16 @@ def get_area_statistics_data_by_device(result_zipcode, sd, ed, selected_address)
 	group by house_id, device_type)
 	
 	select house_id, device_type, consumption, percentagechange, row_number() over (partition by device_type order by consumption desc) as RowNum from get_stats
-	where house_id= %s
-    ''', (result_zipcode, sd, ed, selected_address))
+    ''', (result_zipcode, sd, ed))
     result = cur.fetchall()
     conn.commit()
     cur.close()
     conn.close()
-    return result
+    device_ranks = list()
+    for res in result:
+        if res[0] == int(selected_address):
+            device_ranks.append([res[1], res[2], res[3], res[4]])
+    return device_ranks
 
 def get_device_consumption_data(level, chosenGraph, sd, ed, selected_address, chosen_device):
     conn = psycopg2.connect(database="pds_project", user="postgres", 

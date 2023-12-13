@@ -252,7 +252,7 @@ def calculate_charges():
     address_list = response[1] 
     return render_template('calculate_charges.html', addresses=address_list)
 
-@app.route("/generate_consumption_graph_device")
+@app.route("/generate_consumption_graph_device", methods=['GET', 'POST'])
 def generate_graph_device():
     
     if 'customer_id' not in session:
@@ -273,7 +273,7 @@ def generate_graph_device():
 
     return render_template('generate_consumption_graph_device.html', houses=address_list, device_list = dh)
 
-@app.route("/generate_consumption_graph")
+@app.route("/generate_consumption_graph", methods=['GET', 'POST'])
 def generate_graph():
     
     if 'customer_id' not in session:
@@ -291,7 +291,7 @@ def generate_graph():
     return render_template('generate_consumption_graph.html', houses=address_list )
 
 
-@app.route("/generate_house_statistics")
+@app.route("/generate_house_statistics", methods=['GET', 'POST'])
 def generate_house_statistics():
     
     if 'customer_id' not in session:
@@ -307,7 +307,7 @@ def generate_house_statistics():
     address_list = response[1] 
     return render_template('generate_house_statistics.html', houses=address_list )
 
-@app.route("/generate_area_statistics")
+@app.route("/generate_area_statistics", methods=['GET', 'POST'])
 def generate_area_statistics():
     
     if 'customer_id' not in session:
