@@ -1,57 +1,47 @@
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    display: flex;
-    align-items: center;
-    height: 100vh;
-    background-color: #ebf1f3;
-    justify-content: center;
+    font-family: sans-serif;
+    background: #ebf1f3;
 }
 
-.navbar {
-    margin-top: 100px; /* Add a gap at the top of the navbar */
-}
 
 .register-device-container {
     display: flex;
-    justify-content: space-between; /* Adjusted to create space between the form and graph */
-    align-items: flex-start;
+    justify-content: space-between; /* Changed to space-between to place items at both ends */
+    align-items: center;
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
+    flex-direction: row; /* Changed to row for horizontal alignment */
 }
 
 .register-device-box {
-    width: 48%;
+    width: 40%;
+    min-width: 300px;
+    max-width: 500px;
     padding: 40px;
-    margin-top: 20px; /* Adjusted the margin-top to provide space between the form and the top */
+    margin-top: 20px;
     background-color: #0a2049;
     box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
     border-radius: 10px;
 }
 
-.register-device-box h1,
-.register-device-box h2,
-.register-device-box label {
+.register-device-box h1 {
     color: #fff;
+    padding-bottom: 20px;
 }
-
-.device-box input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-}
-
 .device-box {
     margin-bottom: 20px;
 }
 
 .device-box label {
+    color: #fff;
     display: block;
     margin-bottom: 5px;
 }
 
-.device-box select,
-.device-box input[type="date"] {
+.device-box select {
     width: 100%;
     padding: 10px 0;
     font-size: 16px;
@@ -72,6 +62,7 @@ body {
     text-decoration: none;
     text-transform: uppercase;
     transition: 0.5s;
+    margin-top: 20px;
     letter-spacing: 4px;
     width: 100%;
 }
@@ -82,6 +73,8 @@ body {
 }
 
 .plotly-chart {
-    width: 48%; /* Adjusted width */
-    max-width: 800px;
+    width: 100%; /* Adjusted the width of the graph container */
+    max-width: 800px; /* Optional: Set a maximum width for responsiveness */
 }
+
+/* Add any additional styling as needed */
