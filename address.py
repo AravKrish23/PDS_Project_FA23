@@ -28,7 +28,7 @@ def get_customer_houses(customer_id):
         cur.execute('''select unit_number, flat_number, street_name, city, state from address where address_id = %s''', (res[1],))
         addr = list(cur.fetchone())
         addr = ' '.join(addr)
-        address_list.append({"HouseID": res[0], "address":{addr}})
+        address_list.append({"HouseID": res[0], "address":addr})
     
     success_msg = [1, address_list]
     return success_msg

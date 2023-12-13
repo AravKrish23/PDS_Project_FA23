@@ -269,6 +269,7 @@ def generate_graph_device():
     
     devices_response = get_devices_in_house(address_list)
     dh = devices_response[1]
+    
 
     return render_template('generate_consumption_graph_device.html', houses=address_list, device_list = dh)
 
