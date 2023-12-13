@@ -7,13 +7,19 @@ body {
 
 .register-device-container {
     display: flex;
-    justify-content: space-between; /* Changed to space-between to place items at both ends */
-    align-items: center;
+    justify-content: space-between;
+    align-items: flex-start;
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-    flex-direction: row; /* Changed to row for horizontal alignment */
+    flex-direction: row;
 }
+
+.register-device-box h1 {
+    color: #fff;
+    padding-bottom: 20px;
+}
+
 
 .register-device-box {
     width: 40%;
@@ -26,9 +32,11 @@ body {
     border-radius: 10px;
 }
 
-.register-device-box h1 {
-    color: #fff;
-    padding-bottom: 20px;
+.chart-container {
+    width: 60%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
 }
 
 .device-box {
@@ -53,28 +61,10 @@ body {
     background: transparent;
 }
 
-.energy-button {
-    position: relative;
-    padding: 10px 20px;
-    color: #000000;
-    background-color: rgb(114, 195, 241);
-    font-size: 16px;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: 0.5s;
-    margin-top: 20px;
-    letter-spacing: 4px;
-    width: 100%;
-}
 
-.energy-button:hover {
-    background: rgb(43, 158, 235);
-    border-radius: 5px;
-}
+
 
 .plotly-chart {
     width: 100%;
-    max-width: 800px;
+    /* Add any additional styling as needed */
 }
-
-/* Add any additional styling as needed */

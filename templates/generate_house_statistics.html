@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Energy Consumption Graph</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/generate_consumption_graph.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/generate_house_statistics.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
@@ -39,8 +39,10 @@
                 </div>
                 <br>
                 <br>
-                <input type="submit" id="EC" value="Get EC Chart" class="energy-button">
+                <input type="submit" id="EC" value="Get EC Chart" class="device-box">
             </form>
+        </div>
+        <div class="chart-container">
 
             <div id="energy-consumption-chart" class="plotly-chart"></div>
             <div id="device-type-consumption-chart" class="plotly-chart"></div>

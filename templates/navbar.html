@@ -95,9 +95,9 @@
         <a href="">Usage Statistics</a>
         <div class="sub-menu">
             <a href="{{ url_for('generate_area_statistics') }}">Generate Area Statistics</a>
-            <a href="">Generate Consumption Graph for Devices</a>
-            <a href="">Generate Consumption Graph</a>
-            <a href="">Generate House Statistics</a>
+            <a href="{{ url_for('generate_graph_device') }}">Generate Consumption Graph for Devices</a>
+            <a href="{{ url_for('generate_graph') }}">Generate Consumption Graph</a>
+            <a href="{{ url_for('generate_house_statistics') }}">Generate House Statistics</a>
             <!-- Add more sub-options as needed -->
         </div>
         <!-- Add more options as needed -->
