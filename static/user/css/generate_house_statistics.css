@@ -7,12 +7,12 @@ body {
 
 .register-device-container {
     display: flex;
-    justify-content: center; /* Center the form horizontally */
+    justify-content: center;
     align-items: center;
-    min-height: 100vh; 
+    min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-    flex-direction: column; /* Align items vertically */
+    flex-direction: column;
 }
 
 .register-device-box {
@@ -20,7 +20,7 @@ body {
     min-width: 300px;
     max-width: 500px;
     padding: 40px;
-    margin-top: 20px; /* Add margin at the top for spacing */
+    margin-top: 20px;
     background-color: #0a2049;
     box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
     border-radius: 10px;
@@ -30,6 +30,7 @@ body {
     color: #fff;
     padding-bottom: 20px;
 }
+
 .device-box {
     margin-bottom: 20px;
 }
@@ -72,8 +73,8 @@ body {
 }
 
 .plotly-chart {
-    width: 100%; /* Adjusted the width of the graph container */
-    max-width: 800px; /* Optional: Set a maximum width for responsiveness */
+    width: 100%;
+    max-width: 800px;
 }
 
 /* Add any additional styling as needed */

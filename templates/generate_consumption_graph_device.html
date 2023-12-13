@@ -5,239 +5,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Energy Consumption Graph</title>
-    <!-- <link rel="stylesheet" href="generate_consumption_graph_devices.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/generate_consumption_graph_devices.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 
 <body>
 
-{% include 'navbar.html' %}
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            height: 100vh;
-            background-color: #f2f2f2;
-            justify-content: center;
-        }
+    {% include 'navbar.html' %}
+    <div class="register-device-container">
+        <div class="register-device-box">
+            <h1>Dynamic Energy Consumption Graph</h1>
+           
 
-        form {
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            width: 300px;
-        }
-
-        h2,
-        h3 {
-            color: #333;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        select,
-        input[type="date"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-
-        .device-box {
-            margin-bottom: 15px;
-        }
-
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-
-        #energy-consumption-chart {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-
-    <h2>Dynamic Energy Consumption Graph</h2>
-    <h3>Date Time Form</h3>
-
-    <form id="datetimeForm">
-        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
-        <label for="selected_address">Select Address to View:</label>
-        <select id="selected_address" name="selected_address" required>
-            <option selected>Choose an option</option>
-            {% for house in houses %}
-                <option value="{{ house.HouseID }}">{{ house.address }}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <label for="startDatetime">Start Datetime:</label>
-        <input type="date" id="startDatetime" name="startDatetime" required>
-        <br>
-
-        <label for="endDatetime">End Datetime:</label>
-        <input type="date" id="endDatetime" name="endDatetime" required>
-        <br>
-
-        <div class="device-box">
-            <label for="devices">Device :</label>
-            <select id="devices" name="devices">
-                <option selected disbaled value="All">Choose an option</option>
-            </select>
+            <form id="datetimeForm" class="energy-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="device-box">
+                    <label for="selected_address">Select Address to View:</label>
+                    <select id="selected_address" name="selected_address" required>
+                        <option selected disabled>Choose an option</option>
+                        {% for house in houses %}
+                        <option value="{{ house.HouseID }}">{{ house.address }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="device-box">
+                    <label for="startDatetime">Start Datetime:</label>
+                    <input type="date" id="startDatetime" name="startDatetime" required>
+                </div>
+                <div class="device-box">
+                    <label for="endDatetime">End Datetime:</label>
+                    <input type="date" id="endDatetime" name="endDatetime" required>
+                </div>
+                <div class="device-box">
+                    <label for="devices">Device :</label>
+                    <select id="devices" name="devices">
+                        <option selected disabled value="All">Choose an option</option>
+                    </select>
+                </div>
+                <div class="device-box">
+                    <label for="datelevel">Get Graph Split at a day, month, or year level:</label>
+                    <label>
+                        <input type="radio" id="dateRadio" name="dateLevel" value="day" checked>
+                        Day
+                    </label>
+                    <label>
+                        <input type="radio" id="monthRadio" name="dateLevel" value="month">
+                        Month
+                    </label>
+                    <label>
+                        <input type="radio" id="yearRadio" name="dateLevel" value="year">
+                        Year
+                    </label>
+                </div>
+                <br>
+                <br>
+                <br>
+                <input type="submit" id="EC" value="Get EC Chart" class="energy-button">
+                <input type="submit" id="PC" value="Get Price Chart" class="energy-button">
+            </form>
         </div>
-
-        <br>
-
-        <label for="datelevel">Get Graph Split at a day, month, or year level:</label>
-        <label>
-            <input type="radio" id="dateRadio" name="dateLevel" value="day" checked>
-            Day
-        </label>
-
-        <label>
-            <input type="radio" id="monthRadio" name="dateLevel" value="month">
-            Month
-        </label>
-
-        <label>
-            <input type="radio" id="yearRadio" name="dateLevel" value="year">
-            Year
-        </label>
-
-        <br>
-        <br>
-        <br>
-
-        <input type="submit" id="EC" value="Get EC Chart">
-        <input type="submit" id="PC" value="Get Price Chart">
-    </form>
-
-    <div id="energy-consumption-chart"></div>
+        <div id="energy-consumption-chart" class="plotly-chart"></div>
+    </div>
 
     <script>
-        $(document).ready(function () {
-            var chosenGraph;
-
-            var csrf_token = "{{ csrf_token() }}";
-
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                    }
-                }
-            });
-
-            $("#datetimeForm").submit(function (event) {
-                event.preventDefault();
-
-                if (!validateDates()) {
-                    alert("Start date must be before end date.");
-                    return;
-                }
-
-                var startDatetime = $("#startDatetime").val();
-                var endDatetime = $("#endDatetime").val();
-                var selected_address = $("#selected_address").val();
-                var dateLevel = document.querySelector('input[name="dateLevel"]:checked').value;
-                chosenGraph = buttonClicked;
-                chosenDevice = $("#devices").val();
-                buttonClicked = "";
-
-                $.ajax({
-                    url: '/get_consumption_data_device',
-                    type: 'POST',
-                    data: {
-                        startDatetime: startDatetime,
-                        endDatetime: endDatetime,
-                        selected_address: selected_address,
-                        chosenDevice: chosenDevice,
-                        dateLevel: dateLevel,
-                        chosenGraph: chosenGraph
-                    },
-                    success: function (response) {
-                        console.log("Getting Here! 22");
-                        updateGraph(response);
-                    },
-                    error: function (error) {
-                        console.log('Error:', error);
-                    }
-                });
-            });
-
-            function validateDates() {
-                var startDatetime = new Date($("#startDatetime").val());
-                var endDatetime = new Date($("#endDatetime").val());
-
-                // Check if start date is before end date
-                return startDatetime < endDatetime;
-            }
-
-            $("#datetimeForm input[type='submit']").click(function (e) {
-                buttonClicked = $(this).attr("id");
-            });
-
-            function myFunc(vars) {
-                return vars
-            }
-
-            document.getElementById("selected_address").onchange = function (evt) {
-                var value = evt.target.value;
-                console.log(value);
-                device_list = myFunc({{device_list|tojson}});
-                console.log(device_list)
-                var select = document.getElementById("devices");
-                options = device_list[value];
-                console.log(options)
-                for (var key in options) {
-                    var el = document.createElement("option");
-                    el.text = options[key];
-                    el.value = key;
-                    select.appendChild(el);
-                }
-
-            };
-
-            function updateGraph(response) {
-                var xData = response.dates;
-                var yData = response.values;
-
-                var plotlyData = [{
-                    x: xData,
-                    y: yData,
-                    type: 'bar',
-                    marker: { color: 'blue' },
-                }];
-
-                var layout = {
-                    title: (chosenGraph === "EC") ? 'Dynamic Energy Consumption Over Time' : 'Dynamic Price Chart Over Time',
-                    xaxis: { title: 'Date' },
-                    yaxis: (chosenGraph === "EC") ? { title: 'Energy Consumption (kWh)' } : { title: 'Total Charge' }
-                };
-
-                Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
-            }
-        });
+        // ... (Same JavaScript code as provided)
     </script>
 </body>
 

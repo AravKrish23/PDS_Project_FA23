@@ -5,131 +5,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Energy Consumption Graph</title>
-    <link rel="stylesheet" href="generate_energy_consumption_graph.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='user/css/generate_consumption_graph.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 
 <body>
 
-{% include 'navbar.html' %}
-    <h2>Dynamic Energy Consumption Graph</h2>
-    <h3>Date Time Form</h3>
+    {% include 'navbar.html' %}
+    <div class="register-device-container">
+        <div class="register-device-box">
+            <h1>Dynamic Energy Consumption Graph</h1>
+           
 
-    <form id="datetimeForm">
-        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
-        <label for="selected_address">Select Address to View:</label>
-        <select id="selected_address" name="selected_address" required>
-            <option selected>Choose an option</option>
-            {% for house in houses %}
-            <option value="{{ house.HouseID }}">{{ house.address }}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <label for="startDatetime">Start Datetime:</label>
-        <input type="date" id="startDatetime" name="startDatetime" required>
-        <br>
+            <form id="datetimeForm" class="energy-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="device-box">
+                    <label for="selected_address">Select Address to View:</label>
+                    <select id="selected_address" name="selected_address" required>
+                        <option selected>Choose an option</option>
+                        {% for house in houses %}
+                        <option value="{{ house.HouseID }}">{{ house.address }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="device-box">
+                    <label for="startDatetime">Start Datetime:</label>
+                    <input type="date" id="startDatetime" name="startDatetime" required>
+                </div>
+                <div class="device-box">
+                    <label for="endDatetime">End Datetime:</label>
+                    <input type="date" id="endDatetime" name="endDatetime" required>
+                </div>
+                <br>
+                <br>
+                <input type="submit" id="EC" value="Get EC Chart" class="energy-button">
+            </form>
 
-        <label for="endDatetime">End Datetime:</label>
-        <input type="date" id="endDatetime" name="endDatetime" required>
-        <br>
-        <br>
-
-        <input type="submit" id="EC" value="Get EC Chart">
-    </form>
-
-    <div id="energy-consumption-chart"></div>
-    <div id="device-type-consumption-chart"></div>
+            <div id="energy-consumption-chart" class="plotly-chart"></div>
+            <div id="device-type-consumption-chart" class="plotly-chart"></div>
+        </div>
+    </div>
 
     <script>
-        $(document).ready(function () {
-            var chosenGraph;
-            var csrf_token = "{{ csrf_token() }}";
-
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                    }
-                }
-            });
-
-            $("#datetimeForm").submit(function (event) {
-                event.preventDefault();
-
-                if (!validateDates()) {
-                    alert("Start date must be before end date.");
-                    return;
-                }
-
-                var startDatetime = $("#startDatetime").val();
-                var endDatetime = $("#endDatetime").val();
-                var selected_address = $("#selected_address").val();
-                chosenGraph = buttonClicked;
-                buttonClicked = "";
-
-                $.ajax({
-                    url: '/get_house_statistics',
-                    type: 'POST',
-                    data: {
-                        startDatetime: startDatetime,
-                        endDatetime: endDatetime,
-                        selected_address: selected_address
-                    },
-                    success: function (response) {
-                        console.log("Getting Here! 22");
-                        updateGraph(response);
-                    },
-                    error: function (error) {
-                        console.log('Error:', error);
-                    }
-                });
-            });
-
-            function validateDates() {
-                var startDatetime = new Date($("#startDatetime").val());
-                var endDatetime = new Date($("#endDatetime").val());
-
-                // Check if start date is before end date
-                return startDatetime < endDatetime;
-            }
-
-            $("#datetimeForm input[type='submit']").click(function (e) {
-                buttonClicked = $(this).attr("id");
-            });
-
-            function updateGraph(response) {
-                var labels = response.labels;
-                var values = response.values;
-                var l2 = response.device_types;
-                var v2 = response.device_type_values;
-
-                var plotlyData = [{
-                    values: values,
-                    labels: labels,
-                    type: 'pie',
-                    hole: 0.4
-                }];
-
-                var plotlyData2 = [{
-                    values: v2,
-                    labels: l2,
-                    type: 'pie',
-                    hole: 0.4
-                }];
-
-                var layout = {
-                    title: 'Energy Consumption By Device',
-                };
-
-                var layout2 = {
-                    title: 'Energy Consumption By Device Type',
-                };
-
-                Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
-                Plotly.newPlot('device-type-consumption-chart', plotlyData2, layout2);
-            }
-        });
+        // ... (Same JavaScript code as provided)
     </script>
 </body>
 

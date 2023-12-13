@@ -12,14 +12,14 @@
 
 <body>
 
-{% include 'navbar.html' %}
+    {% include 'navbar.html' %}
     <div class="register-device-container">
         <div class="register-device-box">
             <h1>Dynamic Energy Consumption Graph</h1>
             <h2>Date Time Form</h2>
 
             <form id="datetimeForm" class="energy-form">
-                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" /> 
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <div class="device-box">
                     <label for="selected_address">Select Address to View:</label>
                     <select id="selected_address" name="selected_address" required>
@@ -40,15 +40,17 @@
                 <br>
                 <input type="submit" id="EC" value="Get EC Chart" class="energy-button">
             </form>
-
+            <div id="Consumption"></div>
+            <div id="Statistics"></div>
             <div id="energy-consumption-chart" class="plotly-chart"></div>
             <div id="device-type-consumption-chart" class="plotly-chart"></div>
+
         </div>
+        
+          
     </div>
 
-    <div id="energy-consumption-chart"></div>
-    <div id="Consumption"></div>
-    <div id="Statistics"></div>
+
     <script>
         $(document).ready(function () {
             var chosenGraph;

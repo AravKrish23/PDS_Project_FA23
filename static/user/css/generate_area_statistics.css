@@ -1,74 +1,90 @@
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    display: flex;
-    align-items: center;
-    height: 100vh;
-    background-color: #f2f2f2;
+    font-family: Arial, sans-serif;
+    background: #ebf1f3;
 }
 
 .register-device-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-}
-
-.register-device-box {
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-height: 100vh;
     padding: 20px;
-    text-align: center;
-}
-
-h1 {
-    color: #333;
-}
-
-h2 {
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.device-box {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-}
-
-select, input[type="date"] {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 10px;
     box-sizing: border-box;
 }
 
-.energy-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
+.register-device-box {
+    width: 60%;
+    min-width: 300px;
+    max-width: 600px;
+    padding: 40px;
+    margin-top: 20px;
+    background-color: #0a2049;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+}
+
+.register-device-box h1,
+.register-device-box h2,
+.register-device-box label {
+    color: #fff;
+}
+
+.device-box {
+    margin-bottom: 20px;
+}
+
+.device-box label {
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.device-box select,
+.device-box input[type="date"] {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 10px;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    border-bottom: 1px solid #fff;
+    outline: none;
+    background: transparent;
+}
+
+.energy-button {
+    position: relative;
+    padding: 10px 20px;
+    color: #000000;
+    background-color: rgb(114, 195, 241);
+    font-size: 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: 0.5s;
+    margin-top: 20px;
+    letter-spacing: 4px;
+    width: 100%;
 }
 
 .energy-button:hover {
-    background-color: #45a049;
+    background: rgb(43, 158, 235);
+    border-radius: 5px;
 }
 
 .plotly-chart {
+    width: 100%;
+    max-width: 800px;
+}
+
+#Consumption,
+#Statistics {
+    color: #fff;
     margin-top: 20px;
 }
 
-#energy-consumption-chart, #Consumption, #Statistics {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+.device-box input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
 }

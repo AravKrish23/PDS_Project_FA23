@@ -11,6 +11,8 @@
 </head>
 
 <body>
+
+    {% include 'navbar.html' %}
     <div class="register-device-container">
         <div class="register-device-box">
             <h1>Dynamic Energy Consumption Graph</h1>
@@ -56,8 +58,9 @@
                 <input type="submit" id="PC" value="Get Price Chart" class="energy-button">
             </form>
 
-            <div id="energy-consumption-chart" class="plotly-chart"></div>
+            
         </div>
+        <div id="energy-consumption-chart" class="plotly-chart"></div>
     </div>
 
     <script>
