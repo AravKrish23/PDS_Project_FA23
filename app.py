@@ -7,7 +7,7 @@ from datetime import datetime, date, time
 import random 
 from register_validate import check_and_create_user
 from login_validate import check_login
-from address import register_new_house, get_customer_houses, deregister_address
+from address import register_new_house, get_customer_houses, deregister_address_db
 from devices import get_devices, register_device_home,deregister_device_home, get_devices_in_house
 from graph_queries import get_house_consumption_data, get_device_consumption_data, get_area_statistics_data, get_house_statistics_data, calculate_charges_cost
 
@@ -135,7 +135,7 @@ def deregister_address():
     if request.method == 'POST':
 
         selected_address_id = request.form['selected_address']
-        response = deregister_address(customer_id, selected_address_id)
+        response = deregister_address_db(customer_id, selected_address_id)
         if response[0] == 0:
             failure_msg = response[1]
             flash(failure_msg)

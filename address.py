@@ -1,7 +1,7 @@
 import psycopg2
 
 
-def deregister_address(customer_id, house_id):
+def deregister_address_db(customer_id, house_id):
     conn = psycopg2.connect(database="pds_project", user="postgres", 
             password="password", host="localhost", port="5432") 
     
@@ -11,6 +11,7 @@ def deregister_address(customer_id, house_id):
     conn.commit()
     cur.close()
     conn.close()
+    return [1, "Successfully Deregistered!"]
 
 def get_customer_houses(customer_id):
     conn = psycopg2.connect(database="pds_project", user="postgres", 
