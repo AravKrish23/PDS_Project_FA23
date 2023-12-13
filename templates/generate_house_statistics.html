@@ -48,7 +48,94 @@
     </div>
 
     <script>
-        // ... (Same JavaScript code as provided)
+         $(document).ready(function () {
+            var chosenGraph;
+            var csrf_token = "{{ csrf_token() }}";
+
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+
+            $("#datetimeForm").submit(function (event) {
+                event.preventDefault();
+
+                if (!validateDates()) {
+                    alert("Start date must be before end date.");
+                    return;
+                }
+
+                var startDatetime = $("#startDatetime").val();
+                var endDatetime = $("#endDatetime").val();
+                var selected_address = $("#selected_address").val();
+                chosenGraph = buttonClicked;
+                buttonClicked = "";
+
+                $.ajax({
+                    url: '/get_house_statistics',
+                    type: 'POST',
+                    data: {
+                        startDatetime: startDatetime,
+                        endDatetime: endDatetime,
+                        selected_address: selected_address
+                    },
+                    success: function (response) {
+                        console.log("Getting Here! 22");
+                        updateGraph(response);
+                    },
+                    error: function (error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+
+            function validateDates() {
+                var startDatetime = new Date($("#startDatetime").val());
+                var endDatetime = new Date($("#endDatetime").val());
+
+                // Check if start date is before end date
+                return startDatetime < endDatetime;
+            }
+
+            $("#datetimeForm input[type='submit']").click(function (e) {
+                buttonClicked = $(this).attr("id");
+            });
+
+            function updateGraph(response) {
+                var labels = response.labels;
+                var values = response.values;
+                var l2 = response.device_types;
+                var v2 = response.device_type_values;
+
+                var plotlyData = [{
+                    values: values,
+                    labels: labels,
+                    type: 'pie',
+                    hole: 0.4
+                }];
+
+                var plotlyData2 = [{
+                    values: v2,
+                    labels: l2,
+                    type: 'pie',
+                    hole: 0.4
+                }];
+
+                var layout = {
+                    title: 'Energy Consumption By Device',
+                };
+
+                var layout2 = {
+                    title: 'Energy Consumption By Device Type',
+                };
+
+                Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
+                Plotly.newPlot('device-type-consumption-chart', plotlyData2, layout2);
+            }
+        });
     </script>
 </body>
 

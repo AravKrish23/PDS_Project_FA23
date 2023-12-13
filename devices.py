@@ -60,7 +60,7 @@ def get_devices_in_house(address_list):
     for house in address_list:
         house_id = house["HouseID"]
         
-        cur.execute('''select ed_id,device_type,device_model from enrolled_devices where house_id = %s''', (house_id,))
+        cur.execute('''select ed_id,device_type,device_model from enrolled_devices where house_id = %s and is_active=%s''', (house_id, True))
         devices = cur.fetchall()
         dl = dict()
         for device in devices:

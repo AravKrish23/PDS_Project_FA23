@@ -91,7 +91,7 @@ def get_area_statistics_data(sd, ed, selected_address):
             password="password", host="localhost", port="5432") 
         
     cur = conn.cursor()            
-    cur.execute(''' select zipcode_id from address a join house_info h on h.address_id = a.address_id and h.house_id=%s''', (selected_address, ))
+    cur.execute(''' select zipcode_id from address a join house_info h on h.address_id = a.address_id and h.house_id= %s''', (selected_address, ))
     result_zipcode = cur.fetchone()[0]
     print(result_zipcode)
     cur.execute(
@@ -127,28 +127,85 @@ def get_area_statistics_data(sd, ed, selected_address):
     PercentageChange, round(avg(sqft),0)  from get_range group by house_id
     ''', (result_zipcode, sd, ed))
     result = cur.fetchall()
+    print(result)
+    device_stats = get_area_statistics_data_by_device(result_zipcode, sd, ed, selected_address)
 
+    device_wise_stats = list()
+    for device in device_stats:
+        device_wise_stats.append(device)
+
+    print(device_stats)
     other_bill = 0
     bill = 0
     avg_above = 0
     for data in result:
-        
         if int(data[0]) == int(selected_address):
             bill = data[1]
             avg_above = data[2]
         else:
             other_bill += data[1]        
     percentage_of_total = list()
-    # percentage_of_total.append(bill *100/(bill+other_bill))
-    # percentage_of_total.append(other_bill * 100/(bill+other_bill))
-    percentage_of_total = [50,50]
+    print(other_bill, bill)
+    percentage_of_total= [bill, other_bill]
     labels = ["Your House", "Rest of the service Locations in this zipcode"]
-    consumption_data = {'own_consumption': bill, 'other_consumption':other_bill, 'percentage_of_total':percentage_of_total, 'labels':labels, 'avg_above':avg_above}
+    consumption_data = {'own_consumption': bill, 'other_consumption':other_bill, 'percentage_of_total':percentage_of_total, 'labels':labels, 'avg_above':avg_above, 'device_wise_stats':device_wise_stats}
     conn.commit()
     cur.close()
     conn.close()
     return consumption_data
 
+def get_area_statistics_data_by_device(result_zipcode, sd, ed, selected_address):
+    conn = psycopg2.connect(database="pds_project", user="postgres", 
+            password="password", host="localhost", port="5432") 
+        
+    cur = conn.cursor()            
+    cur.execute(''' select zipcode_id from address a join house_info h on h.address_id = a.address_id and h.house_id=%s''', (selected_address, ))
+    result_zipcode = cur.fetchone()[0]
+    print(result_zipcode)
+    cur.execute(
+    '''
+    with primary_data as (
+    select e.ed_id, ed.device_type, ed.device_model, e.value_stored, e.timestamp, a.zipcode_id, h.customer_id, h.address_id, a.sqft, h.house_id from event_info e 
+    join enrolled_devices ed on ed.ed_id = e.ed_id
+    join house_info h on ed.house_id = h.house_id
+    join address a on a.address_id = h.address_id
+    join event_type et on et.event_type_id = e.event_type_id
+    where et.event_type = 'Energy Use' 
+    and a.zipcode_id = %s),
+
+    sec_data as (
+    select pd.house_id, pd.device_type, sum(value_stored * price_per_unit) as sum1 from primary_data pd
+    join price_map pm 
+    on pd.zipcode_id = pm.zipcode
+    and pm.start_time = (select max(start_time) from price_map where zipcode = pd.zipcode_id and start_time <= pd.timestamp)
+    where pd.timestamp >= %s and pd.timestamp < %s 
+    group by (pd.house_id, pd.device_type)),
+
+    ter_data as (
+    select a.address_id, sd.house_id, sd.device_type, sd.sum1, a.sqft
+        from sec_data sd join house_info h on h.house_id  = sd.house_id
+        join address a on h.address_id = a.address_id
+    ),
+	
+    get_range as (
+    select t.house_id,  t.device_type, t.address_id, t.sqft, t.sum1, t2.sum1 as range_sum 
+	from ter_data t join
+    ter_data t2 
+	on t2.device_type = t.device_type),
+
+    get_stats as (
+    select house_id, device_type, round(avg(sum1),2) as consumption,  round((avg(sum1) - avg(range_sum))*100/avg(range_sum), 2) as 
+    PercentageChange, round(avg(sqft),0) from get_range 
+	group by house_id, device_type)
+	
+	select house_id, device_type, consumption, percentagechange, row_number() over (partition by device_type order by consumption desc) as RowNum from get_stats
+	where house_id= %s
+    ''', (result_zipcode, sd, ed, selected_address))
+    result = cur.fetchall()
+    conn.commit()
+    cur.close()
+    conn.close()
+    return result
 
 def get_device_consumption_data(level, chosenGraph, sd, ed, selected_address, chosen_device):
     conn = psycopg2.connect(database="pds_project", user="postgres", 

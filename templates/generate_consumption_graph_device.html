@@ -69,7 +69,110 @@
     </div>
 
     <script>
-        // ... (Same JavaScript code as provided)
+        $(document).ready(function () {
+            var chosenGraph;
+
+            var csrf_token = "{{ csrf_token() }}";
+
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+
+            $("#datetimeForm").submit(function (event) {
+                event.preventDefault();
+
+                if (!validateDates()) {
+                    alert("Start date must be before end date.");
+                    return;
+                }
+
+                var startDatetime = $("#startDatetime").val();
+                var endDatetime = $("#endDatetime").val();
+                var selected_address = $("#selected_address").val();
+                var dateLevel = document.querySelector('input[name="dateLevel"]:checked').value;
+                chosenGraph = buttonClicked;
+                chosenDevice = $("#devices").val();
+                buttonClicked = "";
+
+                $.ajax({
+                    url: '/get_consumption_data_device',
+                    type: 'POST',
+                    data: {
+                        startDatetime: startDatetime,
+                        endDatetime: endDatetime,
+                        selected_address: selected_address,
+                        chosenDevice: chosenDevice,
+                        dateLevel: dateLevel,
+                        chosenGraph: chosenGraph
+                    },
+                    success: function (response) {
+                        console.log("Getting Here! 22");
+                        updateGraph(response);
+                    },
+                    error: function (error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+
+            function validateDates() {
+                var startDatetime = new Date($("#startDatetime").val());
+                var endDatetime = new Date($("#endDatetime").val());
+
+                // Check if start date is before end date
+                return startDatetime < endDatetime;
+            }
+
+            $("#datetimeForm input[type='submit']").click(function (e) {
+                buttonClicked = $(this).attr("id");
+            });
+
+            function myFunc(vars) {
+                return vars
+            }
+
+            document.getElementById("selected_address").onchange = function (evt) {
+                var value = evt.target.value;
+                console.log(value);
+                device_list = myFunc({{device_list|tojson}});
+                console.log(device_list)
+                var select = document.getElementById("devices");
+                options = device_list[value];
+                console.log(options)
+                for (var key in options) {
+                    var el = document.createElement("option");
+                    el.text = options[key];
+                    el.value = key;
+                    select.appendChild(el);
+                }
+
+            };
+
+            function updateGraph(response) {
+                var xData = response.dates;
+                var yData = response.values;
+
+                var plotlyData = [{
+                    x: xData,
+                    y: yData,
+                    type: 'bar',
+                    marker: { color: 'blue' },
+                }];
+
+                var layout = {
+                    
+                    title: (chosenGraph === "EC") ? 'Dynamic Energy Consumption Over Time for Enrolled Device ID: ' + chosenDevice : 'Dynamic Price Chart Over Time for Enrolled Device ID: ' + chosenDevice ,
+                    xaxis: { title: 'Date' },
+                    yaxis: (chosenGraph === "EC") ? { title: 'Energy Consumption (kWh)' } : { title: 'Total Charge' }
+                };
+
+                Plotly.newPlot('energy-consumption-chart', plotlyData, layout);
+            }
+        });
     </script>
 </body>
 
