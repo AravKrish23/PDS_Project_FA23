@@ -63,7 +63,7 @@
     <script>
         $(document).ready(function () {
             var chosenGraph;
-            var buttonClicked;
+            
 
             var csrf_token = "{{ csrf_token() }}";
 
@@ -92,7 +92,7 @@
                 buttonClicked = "";
 
                 $.ajax({
-                    url: '/get_consumption_data_device',
+                    url: '/get_consumption_data',
                     type: 'POST',
                     data: {
                         startDatetime: startDatetime,
