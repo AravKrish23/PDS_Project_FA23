@@ -63,10 +63,11 @@ def get_house_statistics_data(sd, ed, selected_address):
     select ed2.ed_id, device_type, device_model, 
     energy_usage from energy_data ed join enrolled_devices ed2 
     on ed.ed_id = ed2.ed_id''', ('Energy Use',  sd, ed, selected_address))
+    result = cur.fetchall()
     conn.commit()
     cur.close()
     conn.close()
-    result = cur.fetchall()
+    
     values = list()
     labels  = list()
     device_type_data = dict()
