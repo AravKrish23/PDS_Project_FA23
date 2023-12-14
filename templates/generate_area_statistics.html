@@ -135,7 +135,7 @@
                 if (avg_usage > 0)
                     statText += String(avg_usage) + " percent more units than the average in this time period";
                 else
-                    statText += String(Math.abs(avg_usage)) + " percent more units than the average in this time period";
+                    statText += String(Math.abs(avg_usage)) + " percent less units than the average in this time period";
     
                 document.getElementById("usage_statistics").innerHTML = statText;
                 document.getElementById("average_statistics").innerHTML = consumptionData;

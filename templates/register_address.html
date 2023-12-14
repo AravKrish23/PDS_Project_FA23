@@ -92,23 +92,23 @@
             <p>Serviceable Addresses in Zipcode: {{ zipcode }}</p>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /> 
             <label for="unit_number">Unit Number:</label>
-            <input type="text" name="unit_number" required>
+            <input type="text" name="unit_number" pattern = "^([a-z]|[A-Z]|[0-9]|\s)*$"  title="No Special Characters Allowed" required>
             <br>
 
             <label for="flat_number">Flat Number:</label>
-            <input type="text" name="flat_number" required>
+            <input type="text" name="flat_number" pattern = "^([a-z]|[A-Z]|[0-9]|\s)*$" title="No Special Characters Allowed"  required>
             <br>
 
             <label for="street">Street:</label>
-            <input type="text" name="street" required>
+            <input type="text" name="street"  pattern = "^([a-z]|[A-Z]|[0-9]|\s)*$" title="No Special Characters Allowed" required>
             <br>
 
             <label for="city">City:</label>
-            <input type="text" name="city" required>
+            <input type="text" name="city" pattern = "^([a-z]|[A-Z]|[0-9]|\s)*$" title="No Special Characters Allowed"  required>
             <br>
 
             <label for="state">State:</label>
-            <input type="text" name="state" required>
+            <input type="text" name="state" pattern = "^([a-z]|[A-Z]|[0-9]|\s)*$" title="No Special Characters Allowed" required>
             <br>
 
             <label for="zipcode_fixed">Zipcode:</label>

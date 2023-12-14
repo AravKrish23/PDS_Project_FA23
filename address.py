@@ -8,7 +8,7 @@ def deregister_address_db(customer_id, house_id):
     cur = conn.cursor()
     print("The Selected Address: ",  house_id)
     cur.execute('''update enrolled_devices set is_active= %s where house_id = %s''', (False, house_id))
-    cur.execute('''update house_info set is_current= %s where customer_id = %s and house_id = %s''', (False, customer_id, house_id))
+    cur.execute('''update house_info set is_current= %s, is_primary= %s, is_billing = %s where customer_id = %s and house_id = %s''', (False, False, False, customer_id, house_id))
     conn.commit()
     cur.close()
     conn.close()

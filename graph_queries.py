@@ -139,6 +139,7 @@ def get_area_statistics_data(sd, ed, selected_address):
         if int(data[0]) == int(selected_address):
             bill = data[1]
             avg_above = data[2]
+            print(avg_above)
         else:
             other_bill += data[1]        
     percentage_of_total = list()

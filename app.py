@@ -89,7 +89,7 @@ def login():
 @app.route("/register_address", methods=['GET', 'POST'])
 def register_address():
     
-    if session["customer_id"] is None:
+    if 'customer_id' not in session:
         return render_template('login.html')
     
     if request.method == 'POST':
