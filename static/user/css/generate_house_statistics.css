@@ -20,7 +20,6 @@ body {
     padding-bottom: 20px;
 }
 
-
 .register-device-box {
     width: 40%;
     min-width: 300px;
@@ -36,7 +35,8 @@ body {
     width: 60%;
     max-width: 800px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Change to row to display side by side */
+    justify-content: space-between; /* Add space between the two charts */
 }
 
 .device-box {
@@ -61,10 +61,7 @@ body {
     background: transparent;
 }
 
-
-
-
 .plotly-chart {
-    width: 100%;
+    width: 48%; /* Adjust width as needed */
     /* Add any additional styling as needed */
 }
