@@ -93,21 +93,29 @@ def register_address():
         return render_template('login.html')
     
     if request.method == 'POST':
+        print("Getting Here at least!")
         if 'zipcode' in request.form:
             # Step 1: User selected a zipcode
             zipcode = request.form['zipcode']
+            print("Here!")
             return render_template('register_address.html', step='select_address', zipcode=zipcode)
-
-        elif 'zipcode_fixed' in request.form:
-
+        
+        else:
             zipcode = request.form['zipcode_fixed']
             state = request.form['state']
             city = request.form['city']
             street = request.form['street']
             flat_number = request.form['flat_number']
             unit_number = request.form['unit_number']
-            is_primary = True
-            is_billing = True
+            if 'make_primary' in request.form:
+                is_primary = True
+            else:
+                is_primary = False
+            if 'make_billing' in request.form:
+                is_billing = True
+            else:
+                is_billing = False
+            
             response =  register_new_house(session['customer_id'], zipcode, state, city, street, flat_number, unit_number, is_primary, is_billing)
             if response[0] == 0:
                 failure_message = response[1]

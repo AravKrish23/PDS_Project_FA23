@@ -112,8 +112,13 @@
             <br>
 
             <label for="zipcode_fixed">Zipcode:</label>
-            <input type="zipcode_fixed" name="zipcode_fixed" value="{{ zipcode }}" required>
+            <input type="zipcode_fixed" name="zipcode_fixed" value="{{ zipcode }}" required  readonly="readonly">
             <br>
+
+            <input type="checkbox" id="make_primary" name="make_primary" value="Primary">
+            <label for="make_primary"> Make Primary</label>
+            <input type="checkbox" id="make_billing" name="make_billing" value="Billing">
+            <label for="make_billing">  Make Billing</label><br>
 
             <button type="submit">Register Selected Address</button>
         </form>

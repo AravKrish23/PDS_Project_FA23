@@ -1,5 +1,5 @@
 import psycopg2
-
+from datetime import datetime
 
 def deregister_address_db(customer_id, house_id):
     conn = psycopg2.connect(database="pds_project", user="postgres", 
@@ -7,6 +7,7 @@ def deregister_address_db(customer_id, house_id):
     
     cur = conn.cursor()
     print("The Selected Address: ",  house_id)
+    cur.execute('''update enrolled_devices set is_active= %s where house_id = %s''', (False, house_id))
     cur.execute('''update house_info set is_current= %s where customer_id = %s and house_id = %s''', (False, customer_id, house_id))
     conn.commit()
     cur.close()
@@ -51,7 +52,7 @@ def register_new_house(customer_id, zipcode, state, city, street, flat_number, u
 
         cur = conn.cursor()
                 
-        cur.execute('''select customer_id  from house_info  where address_id = %s order by owner_since desc''', (result[0], ))
+        cur.execute('''select customer_id  from house_info  where address_id = %s and is_current = true order by owner_since desc''', (result[0], ))
         current_owner = cur.fetchone()
         if current_owner is not None:
             if current_owner[0] == customer_id:  
@@ -76,7 +77,7 @@ def register_new_house(customer_id, zipcode, state, city, street, flat_number, u
 
                     
         cur = conn.cursor()
-        cur.execute('''insert into house_info (address_id, customer_id, owner_since, is_primary, is_billing, is_current) VALUES (%s, %s, %s, %s, %s, %s) RETURNING house_id''', (result[0], customer_id, '20201223', is_primary, is_billing, True ))
+        cur.execute('''insert into house_info (address_id, customer_id, owner_since, is_primary, is_billing, is_current) VALUES (%s, %s, %s, %s, %s, %s) RETURNING house_id''', (result[0], customer_id,  str(datetime.today().strftime('%Y-%m-%d')), is_primary, is_billing, True ))
         new_reg_id = cur.fetchall()
         nri = str(new_reg_id[0][0]) 
         success_statement = [1, "Successfully Registered, Your House Id is:" + nri]
